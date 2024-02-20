@@ -12,8 +12,8 @@ class Item(ABC):
 
     def keys(self):
         return {
-            "PK": self.pk,
-            "SK": self.sk
+            "PK": self.get_pk(),
+            "SK": self.get_sk()
         }
 
     @abstractmethod

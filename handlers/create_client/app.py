@@ -1,10 +1,6 @@
-import boto3
-import os
 import json
-import uuid
-from datetime import datetime
 
-from data.client import Client, create_client
+from client import Client, create_client
 
 
 def lambda_handler(message, context):

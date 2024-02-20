@@ -1,10 +1,8 @@
 import boto3
 import os
-import json
-import datetime
 from boto3.dynamodb.conditions import Key
 
-from .item_base import Item
+from item import Item
 
 class Client(Item):
     def __init__(
@@ -15,7 +13,6 @@ class Client(Item):
         over_18,
         preferred_contact,
         phone_number,
-        pathogens
     ):
         self.email = email
         self.name = name
@@ -23,7 +20,6 @@ class Client(Item):
         self.over_18 = over_18
         self.preferred_contact = preferred_contact
         self.phone_number = phone_number
-        self.pathogens = pathogens
 
     def get_pk(self):
         return f"CLIENT#{self.email}"
@@ -32,7 +28,14 @@ class Client(Item):
         return f"CLIENT#{self.email}"
 
     def to_item(self):
-        return self.__dict__
+        return {
+            **self.keys(),
+            "name": self.name,
+            "pronouns": self.pronouns,
+            "over_18": self.over_18,
+            "preferred_contact": self.preferred_contact,
+            "phone_number": self.phone_number
+        }
 
 
 def create_client(client):
