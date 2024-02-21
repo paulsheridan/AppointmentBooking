@@ -43,7 +43,7 @@ Resources:
   CreateAppointmentFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: handlers/create_appointment/
+      CodeUri: handlers/appointments/create_appointment/
       Handler: app.lambda_handler
       Runtime: python3.12
       Environment:
@@ -67,7 +67,7 @@ Resources:
   GetAppointmentFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: handlers/get_appointment/
+      CodeUri: handlers/appointments/get_appointment/
       Handler: app.lambda_handler
       Runtime: python3.12
       Environment:
@@ -85,11 +85,13 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref AppointmentsTable
+      Layers:
+      - !Ref Services
 
   ListAppointmentsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: handlers/list_appointments/
+      CodeUri: handlers/appointments/list_appointments/
       Handler: app.lambda_handler
       Runtime: python3.12
       Environment:
@@ -111,7 +113,7 @@ Resources:
   UpdateAppointmentFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: handlers/update_appointment/
+      CodeUri: handlers/appointments/update_appointment/
       Handler: app.lambda_handler
       Runtime: python3.12
       Environment:
@@ -133,7 +135,7 @@ Resources:
   DeleteAppointmentFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: handlers/delete_appointment/
+      CodeUri: handlers/appointments/delete_appointment/
       Handler: app.lambda_handler
       Runtime: python3.12
       Environment:
@@ -155,7 +157,7 @@ Resources:
   CreateClientFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: handlers/create_client/
+      CodeUri: handlers/clients/create_client/
       Handler: app.lambda_handler
       Runtime: python3.12
       Environment:
@@ -180,7 +182,7 @@ Resources:
   ListClientsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: handlers/list_clients/
+      CodeUri: handlers/clients/list_clients/
       Handler: app.lambda_handler
       Runtime: python3.12
       Environment:
