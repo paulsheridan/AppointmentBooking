@@ -17,8 +17,4 @@ def lambda_handler(message, context):
 
     create_client(client)
 
-    return {
-        "statusCode": 201,
-        "headers": {},
-        "body": json.dumps(client.__dict__)
-    }
+    return {"statusCode": 201, "headers": {}, "body": json.dumps(client.__dict__)}

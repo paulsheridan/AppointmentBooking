@@ -1,3 +1,4 @@
+import json
 from abc import ABC, abstractmethod
 
 class Item(ABC):
@@ -19,3 +20,6 @@ class Item(ABC):
     @abstractmethod
     def to_item():
         pass
+
+    def toJSON(self):
+        return json.dumps(self, default=lambda obj: obj.__dict__)

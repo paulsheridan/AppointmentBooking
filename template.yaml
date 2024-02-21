@@ -22,6 +22,10 @@ Parameters:
     AllowedValues:
       - Dev
       - Prod
+  Table:
+    Type: String
+    Default: Appointments
+
 
 Resources:
   AppointmentApi:
@@ -36,115 +40,117 @@ Resources:
       #     CognitoAuthorizer:
       #       UserPoolArn: !GetAtt CognitoUserPool.Arn
 
-  # CreateAppointmentFunction:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     CodeUri: handlers/create_appointment/
-  #     Handler: app.lambda_handler
-  #     Runtime: python3.12
-  #     Environment:
-  #       Variables:
-  #         REGION: !Ref Region
-  #         STAGE: !Ref Stage
-  #     Events:
-  #       ApiEvent:
-  #         Type: Api
-  #         Properties:
-  #           Path: /appointments
-  #           Method: post
-  #           RestApiId:
-  #             Ref: AppointmentApi
-  #     Policies:
-  #       - DynamoDBCrudPolicy:
-  #           TableName: !Ref AppointmentsTable
+  CreateAppointmentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: handlers/create_appointment/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Environment:
+        Variables:
+          REGION: !Ref Region
+          STAGE: !Ref Stage
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /appointments
+            Method: post
+            RestApiId:
+              Ref: AppointmentApi
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AppointmentsTable
+      Layers:
+      - !Ref Services
 
-  # GetAppointmentFunction:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     CodeUri: handlers/get_appointment/
-  #     Handler: app.lambda_handler
-  #     Runtime: python3.12
-  #     Environment:
-  #       Variables:
-  #         REGION: !Ref Region
-  #         STAGE: !Ref Stage
-  #     Events:
-  #       AppointmentApi:
-  #         Type: Api
-  #         Properties:
-  #           Path: /appointments/{id}
-  #           Method: get
-  #           RestApiId:
-  #             Ref: AppointmentApi
-  #     Policies:
-  #       - DynamoDBCrudPolicy:
-  #           TableName: !Ref AppointmentsTable
+  GetAppointmentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: handlers/get_appointment/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Environment:
+        Variables:
+          REGION: !Ref Region
+          STAGE: !Ref Stage
+      Events:
+        AppointmentApi:
+          Type: Api
+          Properties:
+            Path: /appointments/{id}
+            Method: get
+            RestApiId:
+              Ref: AppointmentApi
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AppointmentsTable
 
-  # ListAppointmentsFunction:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     CodeUri: handlers/list_appointments/
-  #     Handler: app.lambda_handler
-  #     Runtime: python3.12
-  #     Environment:
-  #       Variables:
-  #         REGION: !Ref Region
-  #         STAGE: !Ref Stage
-  #     Events:
-  #       AppointmentApi:
-  #         Type: Api
-  #         Properties:
-  #           Path: /appointments
-  #           Method: get
-  #           RestApiId:
-  #             Ref: AppointmentApi
-  #     Policies:
-  #       - DynamoDBCrudPolicy:
-  #           TableName: !Ref AppointmentsTable
+  ListAppointmentsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: handlers/list_appointments/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Environment:
+        Variables:
+          REGION: !Ref Region
+          STAGE: !Ref Stage
+      Events:
+        AppointmentApi:
+          Type: Api
+          Properties:
+            Path: /appointments
+            Method: get
+            RestApiId:
+              Ref: AppointmentApi
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AppointmentsTable
 
-  # UpdateAppointmentFunction:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     CodeUri: handlers/update_appointment/
-  #     Handler: app.lambda_handler
-  #     Runtime: python3.12
-  #     Environment:
-  #       Variables:
-  #         REGION: !Ref Region
-  #         STAGE: !Ref Stage
-  #     Events:
-  #       AppointmentApi:
-  #         Type: Api
-  #         Properties:
-  #           Path: /appointments/{id}
-  #           Method: put
-  #           RestApiId:
-  #             Ref: AppointmentApi
-  #     Policies:
-  #       - DynamoDBCrudPolicy:
-  #           TableName: !Ref AppointmentsTable
+  UpdateAppointmentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: handlers/update_appointment/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Environment:
+        Variables:
+          REGION: !Ref Region
+          STAGE: !Ref Stage
+      Events:
+        AppointmentApi:
+          Type: Api
+          Properties:
+            Path: /appointments/{id}
+            Method: put
+            RestApiId:
+              Ref: AppointmentApi
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AppointmentsTable
 
-  # DeleteAppointmentFunction:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     CodeUri: handlers/delete_appointment/
-  #     Handler: app.lambda_handler
-  #     Runtime: python3.12
-  #     Environment:
-  #       Variables:
-  #         REGION: !Ref Region
-  #         STAGE: !Ref Stage
-  #     Events:
-  #       AppointmentApi:
-  #         Type: Api
-  #         Properties:
-  #           Path: /appointments/{id}
-  #           Method: delete
-  #           RestApiId:
-  #             Ref: AppointmentApi
-  #     Policies:
-  #       - DynamoDBCrudPolicy:
-  #           TableName: !Ref AppointmentsTable
+  DeleteAppointmentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: handlers/delete_appointment/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Environment:
+        Variables:
+          REGION: !Ref Region
+          STAGE: !Ref Stage
+      Events:
+        AppointmentApi:
+          Type: Api
+          Properties:
+            Path: /appointments/{id}
+            Method: delete
+            RestApiId:
+              Ref: AppointmentApi
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AppointmentsTable
 
   CreateClientFunction:
     Type: AWS::Serverless::Function
@@ -156,6 +162,7 @@ Resources:
         Variables:
           REGION: !Ref Region
           STAGE: !Ref Stage
+          TABLE_NAME: !Ref Table
       Events:
         ApiEvent:
           Type: Api
@@ -168,12 +175,37 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref AppointmentsTable
       Layers:
-      - !Ref ClientLayer
+      - !Ref Services
 
-  ClientLayer:
+  ListClientsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: handlers/list_clients/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Environment:
+        Variables:
+          REGION: !Ref Region
+          STAGE: !Ref Stage
+          TABLE_NAME: !Ref Table
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /clients
+            Method: get
+            RestApiId:
+              Ref: AppointmentApi
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AppointmentsTable
+      Layers:
+      - !Ref Services
+
+  Services:
     Type: AWS::Serverless::LayerVersion
     Properties:
-      ContentUri: services/client/
+      ContentUri: services/
       CompatibleRuntimes:
         - python3.12
     Metadata:
@@ -253,42 +285,48 @@ Outputs:
   AppointmentApi:
     Description: "API Gateway endpoint URL for Prod stage for Create Appointment Function"
     Value: !Sub "https://${AppointmentApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}/appointments/"
-  # CreateAppointmentFunction:
-  #   Description: "Create Appointment Lambda Function ARN"
-  #   Value: !GetAtt CreateAppointmentFunction.Arn
-  # CreateAppointmentFunctionIamRole:
-  #   Description: "Implicit IAM Role created for Create Appointment function"
-  #   Value: !GetAtt CreateAppointmentFunctionRole.Arn
-  # GetAppointmentFunction:
-  #   Description: "Get Appointment Lambda Function ARN"
-  #   Value: !GetAtt GetAppointmentFunction.Arn
-  # GetAppointmentFunctionIamRole:
-  #   Description: "Implicit IAM Role created for Get Appointment function"
-  #   Value: !GetAtt GetAppointmentFunctionRole.Arn
-  # ListAppointmentsFunction:
-  #   Description: "List Appointments Lambda Function ARN"
-  #   Value: !GetAtt ListAppointmentsFunction.Arn
-  # ListAppointmentsFunctionIamRole:
-  #   Description: "Implicit IAM Role created for List Appointments function"
-  #   Value: !GetAtt ListAppointmentsFunctionRole.Arn
-  # UpdateAppointmentFunction:
-  #   Description: "Update Appointment Lambda Function ARN"
-  #   Value: !GetAtt UpdateAppointmentFunction.Arn
-  # UpdateAppointmentFunctionIamRole:
-  #   Description: "Implicit IAM Role created for Update Appointment function"
-  #   Value: !GetAtt UpdateAppointmentFunctionRole.Arn
-  # DeleteAppointmentFunction:
-  #   Description: "Delete Appointment Lambda Function ARN"
-  #   Value: !GetAtt DeleteAppointmentFunction.Arn
-  # DeleteAppointmentFunctionIamRole:
-  #   Description: "Implicit IAM Role created for Delete Appointment function"
-  #   Value: !GetAtt DeleteAppointmentFunctionRole.Arn
+  CreateAppointmentFunction:
+    Description: "Create Appointment Lambda Function ARN"
+    Value: !GetAtt CreateAppointmentFunction.Arn
+  CreateAppointmentFunctionIamRole:
+    Description: "Implicit IAM Role created for Create Appointment function"
+    Value: !GetAtt CreateAppointmentFunctionRole.Arn
+  GetAppointmentFunction:
+    Description: "Get Appointment Lambda Function ARN"
+    Value: !GetAtt GetAppointmentFunction.Arn
+  GetAppointmentFunctionIamRole:
+    Description: "Implicit IAM Role created for Get Appointment function"
+    Value: !GetAtt GetAppointmentFunctionRole.Arn
+  ListAppointmentsFunction:
+    Description: "List Appointments Lambda Function ARN"
+    Value: !GetAtt ListAppointmentsFunction.Arn
+  ListAppointmentsFunctionIamRole:
+    Description: "Implicit IAM Role created for List Appointments function"
+    Value: !GetAtt ListAppointmentsFunctionRole.Arn
+  UpdateAppointmentFunction:
+    Description: "Update Appointment Lambda Function ARN"
+    Value: !GetAtt UpdateAppointmentFunction.Arn
+  UpdateAppointmentFunctionIamRole:
+    Description: "Implicit IAM Role created for Update Appointment function"
+    Value: !GetAtt UpdateAppointmentFunctionRole.Arn
+  DeleteAppointmentFunction:
+    Description: "Delete Appointment Lambda Function ARN"
+    Value: !GetAtt DeleteAppointmentFunction.Arn
+  DeleteAppointmentFunctionIamRole:
+    Description: "Implicit IAM Role created for Delete Appointment function"
+    Value: !GetAtt DeleteAppointmentFunctionRole.Arn
   CreateClientFunction:
     Description: "Create Client Lambda Function ARN"
     Value: !GetAtt CreateClientFunction.Arn
   CreateClientFunctionIamRole:
     Description: "Implicit IAM Role created for Create Client function"
     Value: !GetAtt CreateClientFunctionRole.Arn
+  ListClientsFunction:
+    Description: "List Clients Lambda Function ARN"
+    Value: !GetAtt ListClientsFunction.Arn
+  ListClientsFunctionIamRole:
+    Description: "Implicit IAM Role created for List Clients function"
+    Value: !GetAtt ListClientsFunctionRole.Arn
   AppointmentsTable:
     Description: "DynamoDB Table"
     Value: !Ref AppointmentsTable
