@@ -1,9 +1,7 @@
 import boto3
 import os
 import json
-
 from boto3.dynamodb.conditions import Key
-from datetime import datetime
 
 from item import Item
 
@@ -16,11 +14,7 @@ class Appointment(Item):
 
     @classmethod
     def from_item(cls, item):
-        return cls(
-            item["email"],
-            item["start_datetime"],
-            item["end_datetime"]
-        )
+        return cls(item["email"], item["start_datetime"], item["end_datetime"])
 
     def get_pk(self):
         return f"CLIENT#{self.email}"

@@ -13,4 +13,8 @@ def lambda_handler(message, context):
         }
 
     clients = list_clients()
-    return {"statusCode": 200, "headers": {}, "body": json.dumps([client.toJSON() for client in clients])}
+    return {
+        "statusCode": 200,
+        "headers": {},
+        "body": json.dumps([client.toJSON() for client in clients]),
+    }

@@ -1,6 +1,7 @@
 import json
 from abc import ABC, abstractmethod
 
+
 class Item(ABC):
 
     @abstractmethod
@@ -12,10 +13,7 @@ class Item(ABC):
         pass
 
     def keys(self):
-        return {
-            "PK": self.get_pk(),
-            "SK": self.get_sk()
-        }
+        return {"PK": self.get_pk(), "SK": self.get_sk()}
 
     @abstractmethod
     def to_item():
