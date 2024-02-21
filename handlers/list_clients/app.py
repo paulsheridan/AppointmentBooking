@@ -1,6 +1,6 @@
 import json
 
-from client import Client, create_client, list_clients
+from client import Client, list_clients
 
 
 def lambda_handler(message, context):

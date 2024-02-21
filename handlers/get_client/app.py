@@ -3,7 +3,7 @@ import os
 import json
 from boto3.dynamodb.conditions import Key
 
-from appointment import Appointment, get_appointment
+from client import Client, get_client
 
 
 def lambda_handler(message, context):
@@ -16,8 +16,7 @@ def lambda_handler(message, context):
         }
 
     email = message["pathParameters"]["email"]
-    start_datetime = message["pathParameters"]["start_datetime"]
 
-    appointment = get_appointment(email, start_datetime)
+    client = get_client(email)
 
-    return {"statusCode": 200, "headers": {}, "body": json.dumps(appointment)}
+    return {"statusCode": 200, "headers": {}, "body": json.dumps(client)}

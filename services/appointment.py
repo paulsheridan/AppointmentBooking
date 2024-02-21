@@ -53,7 +53,7 @@ def create_appointment(appointment):
     return appointment
 
 
-def get_client(email, start_datetime):
+def get_appointment(email, start_datetime):
     region = os.environ.get("REGION", "us-west-2")
     aws_environment = os.environ.get("AWSENV", "dev")
     table_name = os.environ.get("TABLE_NAME", "Appointments")
