@@ -5,15 +5,15 @@ from abc import ABC, abstractmethod
 class Item(ABC):
 
     @abstractmethod
-    def get_pk():
+    def pk():
         pass
 
     @abstractmethod
-    def get_sk():
+    def sk():
         pass
 
     def keys(self):
-        return {"PK": self.get_pk(), "SK": self.get_sk()}
+        return {"PK": self.pk(), "SK": self.sk()}
 
     @abstractmethod
     def to_item():

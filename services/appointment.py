@@ -7,27 +7,37 @@ from item import Item
 
 
 class Appointment(Item):
-    def __init__(self, email, start_datetime, end_datetime):
-        self.email = email
+
+    def __init__(self, client_email, user_id, start_datetime, end_datetime, approved):
+        self.client_email = client_email
+        self.user_id = user_id
         self.start_datetime = start_datetime
         self.end_datetime = end_datetime
+        self.approved = approved
 
     @classmethod
     def from_item(cls, item):
-        return cls(item["email"], item["start_datetime"], item["end_datetime"])
+        return cls(
+            item["client_email"],
+            item["user_id"],
+            item["start_datetime"],
+            item["end_datetime"],
+        )
 
-    def get_pk(self):
-        return f"CLIENT#{self.email}"
+    def pk(self):
+        return f"USER#{self.user_id}"
 
-    def get_sk(self):
+    def sk(self):
         return f"APPT#{self.start_datetime}"
 
     def to_item(self):
         return {
             **self.keys(),
-            "email": self.email,
+            "client_email": self.client_email,
+            "user_id": self.user_id,
             "start_datetime": self.start_datetime,
             "end_datetime": self.end_datetime,
+            "item_type": "appointment",
         }
 
 
@@ -43,7 +53,9 @@ def create_appointment(appointment):
 
     table = table_resource.Table(table_name)
 
-    table.put_item(TableName=table_name, Item=appointment.to_item())
+    table.put_item(
+        TableName=table_name, Item=appointment.to_item()
+    )  # Can the table name be gotten rid of here for the sake of DRYing out the code?
     return appointment
 
 
