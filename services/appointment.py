@@ -55,7 +55,7 @@ def create_appointment(appointment):
 
     table.put_item(
         TableName=table_name, Item=appointment.to_item()
-    )  # Can the table name be gotten rid of here for the sake of DRYing out the code?
+    )  # TODO: Can the table name be gotten rid of here for the sake of DRYing out the code?
     return appointment
 
 

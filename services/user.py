@@ -7,11 +7,12 @@ from item import Item
 
 
 class User(Item):
-    def __init__(self, user_id, username, email, date_created):
+    def __init__(self, user_id, username, email, date_created, availability):
         self.user_id = user_id
         self.username = username
         self.email = email
         self.date_created = date_created
+        self.availability = availability
 
     @classmethod
     def from_item(cls, item):
@@ -20,6 +21,7 @@ class User(Item):
             item["username"],
             item["email"],
             item["date_created"],
+            item["availability"]
         )
 
     def pk(self):
@@ -35,5 +37,6 @@ class User(Item):
             "username": self.username,
             "email": self.email,
             "date_created": self.date_created,
+            "availability": self.availabilty,
             "item_type": "user"
         }
