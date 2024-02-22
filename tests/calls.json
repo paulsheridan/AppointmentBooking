@@ -1,0 +1,38 @@
+{
+    "email": "paul.clientman@email.com",
+    "name": "Paul Clientman",
+    "pronouns": "he-him",
+    "over_18": true,
+    "preferred_contact": "email",
+    "phone_number": "123-456-7890"
+}
+
+{
+    "email": "helena.clientkid@email.com",
+    "name": "Helena Clientkid",
+    "pronouns": "she-her",
+    "over_18": false,
+    "preferred_contact": "email",
+    "phone_number": "123-456-7890"
+}
+
+{
+    "email": "ivy.clientkid@email.com",
+    "name": "Ivy Clientkid",
+    "pronouns": "she-her",
+    "over_18": false,
+    "preferred_contact": "phone",
+    "phone_number": "123-456-7890"
+}
+
+{
+    "email": "helena.clientkid@email.com",
+    "start_datetime": "2021-06-11T00:00:00",
+    "end_datetime": "2021-06-11T00:00:00"
+}
+
+{
+    "email": "ivy.clientkid@email.com",
+    "start_datetime": "12:34:56.000000",
+    "end_datetime": "12:34:56.000000"
+}

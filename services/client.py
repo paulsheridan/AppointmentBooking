@@ -1,6 +1,5 @@
 import boto3
 import os
-import json
 
 from boto3.dynamodb.conditions import Key
 
@@ -99,5 +98,8 @@ def list_clients():
 
     table = table_resource.Table(table_name)
 
-    response = table.scan()
+    response = table.query(
+        TableName=table_name,
+        KeyConditionExpression=Key('sk').begins_with("CLIENT#")
+    )
     return [Client.from_item(item) for item in response["Items"]]
