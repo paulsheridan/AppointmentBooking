@@ -1,4 +1,12 @@
 {
+    "user_id": "12345",
+    "name": "Tatters Tattooist",
+    "username": "tattoo_artist",
+    "email": "tatters.tattooist@example.com"
+}
+
+
+{
     "email": "paul.clientman@email.com",
     "name": "Paul Clientman",
     "pronouns": "he-him",
@@ -8,8 +16,8 @@
 }
 
 {
-    "email": "helena.clientkid@email.com",
-    "name": "Helena Clientkid",
+    "email": "emily.clientkid@email.com",
+    "name": "Emily Clientkid",
     "pronouns": "she-her",
     "over_18": false,
     "preferred_contact": "email",
@@ -17,8 +25,8 @@
 }
 
 {
-    "email": "ivy.clientkid@email.com",
-    "name": "Ivy Clientkid",
+    "email": "nicki.clientkid@email.com",
+    "name": "Nicki Clientkid",
     "pronouns": "she-her",
     "over_18": false,
     "preferred_contact": "phone",
@@ -26,13 +34,13 @@
 }
 
 {
-    "email": "helena.clientkid@email.com",
+    "email": "kim.clientkid@email.com",
     "start_datetime": "2021-06-11T00:00:00",
     "end_datetime": "2021-06-11T00:00:00"
 }
 
 {
-    "email": "ivy.clientkid@email.com",
+    "email": "vibe.clientkid@email.com",
     "start_datetime": "12:34:56.000000",
     "end_datetime": "12:34:56.000000"
 }

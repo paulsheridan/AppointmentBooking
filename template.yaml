@@ -25,7 +25,8 @@ Parameters:
   Table:
     Type: String
     Default: Appointments
-
+  CognitoUserEmail:
+    Type: String
 
 Resources:
   AppointmentApi:
@@ -40,34 +41,174 @@ Resources:
           CognitoAuthorizer:
             UserPoolArn: !GetAtt CognitoUserPool.Arn
 
-  CreateAppointmentFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: handlers/appointments/create_appointment/
-      Handler: app.lambda_handler
-      Runtime: python3.12
-      Environment:
-        Variables:
-          REGION: !Ref Region
-          STAGE: !Ref Stage
-      Events:
-        ApiEvent:
-          Type: Api
-          Properties:
-            Path: /appointments
-            Method: post
-            RestApiId:
-              Ref: AppointmentApi
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref AppointmentsTable
-      Layers:
-      - !Ref Services
+  # CreateAppointmentFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     CodeUri: handlers/appointments/create_appointment/
+  #     Handler: app.lambda_handler
+  #     Runtime: python3.12
+  #     Environment:
+  #       Variables:
+  #         REGION: !Ref Region
+  #         STAGE: !Ref Stage
+  #     Events:
+  #       ApiEvent:
+  #         Type: Api
+  #         Properties:
+  #           Path: /appointments
+  #           Method: post
+  #           RestApiId:
+  #             Ref: AppointmentApi
+  #     Policies:
+  #       - DynamoDBCrudPolicy:
+  #           TableName: !Ref AppointmentsTable
+  #     Layers:
+  #     - !Ref Services
 
-  GetAppointmentFunction:
+  # GetAppointmentFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     CodeUri: handlers/appointments/get_appointment/
+  #     Handler: app.lambda_handler
+  #     Runtime: python3.12
+  #     Environment:
+  #       Variables:
+  #         REGION: !Ref Region
+  #         STAGE: !Ref Stage
+  #     Events:
+  #       AppointmentApi:
+  #         Type: Api
+  #         Properties:
+  #           Path: /appointments/{id}
+  #           Method: get
+  #           RestApiId:
+  #             Ref: AppointmentApi
+  #     Policies:
+  #       - DynamoDBCrudPolicy:
+  #           TableName: !Ref AppointmentsTable
+  #     Layers:
+  #     - !Ref Services
+
+  # ListAppointmentsFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     CodeUri: handlers/appointments/list_appointments/
+  #     Handler: app.lambda_handler
+  #     Runtime: python3.12
+  #     Environment:
+  #       Variables:
+  #         REGION: !Ref Region
+  #         STAGE: !Ref Stage
+  #     Events:
+  #       AppointmentApi:
+  #         Type: Api
+  #         Properties:
+  #           Path: /appointments
+  #           Method: get
+  #           RestApiId:
+  #             Ref: AppointmentApi
+  #     Policies:
+  #       - DynamoDBCrudPolicy:
+  #           TableName: !Ref AppointmentsTable
+
+  # UpdateAppointmentFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     CodeUri: handlers/appointments/update_appointment/
+  #     Handler: app.lambda_handler
+  #     Runtime: python3.12
+  #     Environment:
+  #       Variables:
+  #         REGION: !Ref Region
+  #         STAGE: !Ref Stage
+  #     Events:
+  #       AppointmentApi:
+  #         Type: Api
+  #         Properties:
+  #           Path: /appointments/{id}
+  #           Method: put
+  #           RestApiId:
+  #             Ref: AppointmentApi
+  #     Policies:
+  #       - DynamoDBCrudPolicy:
+  #           TableName: !Ref AppointmentsTable
+
+  # DeleteAppointmentFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     CodeUri: handlers/appointments/delete_appointment/
+  #     Handler: app.lambda_handler
+  #     Runtime: python3.12
+  #     Environment:
+  #       Variables:
+  #         REGION: !Ref Region
+  #         STAGE: !Ref Stage
+  #     Events:
+  #       AppointmentApi:
+  #         Type: Api
+  #         Properties:
+  #           Path: /appointments/{id}
+  #           Method: delete
+  #           RestApiId:
+  #             Ref: AppointmentApi
+  #     Policies:
+  #       - DynamoDBCrudPolicy:
+  #           TableName: !Ref AppointmentsTable
+
+  # CreateClientFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     CodeUri: handlers/clients/create_client/
+  #     Handler: app.lambda_handler
+  #     Runtime: python3.12
+  #     Environment:
+  #       Variables:
+  #         REGION: !Ref Region
+  #         STAGE: !Ref Stage
+  #         TABLE_NAME: !Ref Table
+  #     Events:
+  #       ApiEvent:
+  #         Type: Api
+  #         Properties:
+  #           Path: /clients
+  #           Method: post
+  #           RestApiId:
+  #             Ref: AppointmentApi
+  #     Policies:
+  #       - DynamoDBCrudPolicy:
+  #           TableName: !Ref AppointmentsTable
+  #     Layers:
+  #     - !Ref Services
+
+  # ListClientsFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     CodeUri: handlers/clients/list_clients/
+  #     Handler: app.lambda_handler
+  #     Runtime: python3.12
+  #     Environment:
+  #       Variables:
+  #         REGION: !Ref Region
+  #         STAGE: !Ref Stage
+  #         TABLE_NAME: !Ref Table
+  #     Events:
+  #       ApiEvent:
+  #         Type: Api
+  #         Properties:
+  #           Path: /clients
+  #           Method: get
+  #           RestApiId:
+  #             Ref: AppointmentApi
+  #     Policies:
+  #       - DynamoDBCrudPolicy:
+  #           TableName: !Ref AppointmentsTable
+  #     Layers:
+  #     - !Ref Services
+
+  GetUserFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: handlers/appointments/get_appointment/
+      CodeUri: handlers/users/get_user/
       Handler: app.lambda_handler
       Runtime: python3.12
       Environment:
@@ -78,123 +219,7 @@ Resources:
         AppointmentApi:
           Type: Api
           Properties:
-            Path: /appointments/{id}
-            Method: get
-            RestApiId:
-              Ref: AppointmentApi
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref AppointmentsTable
-      Layers:
-      - !Ref Services
-
-  ListAppointmentsFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: handlers/appointments/list_appointments/
-      Handler: app.lambda_handler
-      Runtime: python3.12
-      Environment:
-        Variables:
-          REGION: !Ref Region
-          STAGE: !Ref Stage
-      Events:
-        AppointmentApi:
-          Type: Api
-          Properties:
-            Path: /appointments
-            Method: get
-            RestApiId:
-              Ref: AppointmentApi
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref AppointmentsTable
-
-  UpdateAppointmentFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: handlers/appointments/update_appointment/
-      Handler: app.lambda_handler
-      Runtime: python3.12
-      Environment:
-        Variables:
-          REGION: !Ref Region
-          STAGE: !Ref Stage
-      Events:
-        AppointmentApi:
-          Type: Api
-          Properties:
-            Path: /appointments/{id}
-            Method: put
-            RestApiId:
-              Ref: AppointmentApi
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref AppointmentsTable
-
-  DeleteAppointmentFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: handlers/appointments/delete_appointment/
-      Handler: app.lambda_handler
-      Runtime: python3.12
-      Environment:
-        Variables:
-          REGION: !Ref Region
-          STAGE: !Ref Stage
-      Events:
-        AppointmentApi:
-          Type: Api
-          Properties:
-            Path: /appointments/{id}
-            Method: delete
-            RestApiId:
-              Ref: AppointmentApi
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref AppointmentsTable
-
-  CreateClientFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: handlers/clients/create_client/
-      Handler: app.lambda_handler
-      Runtime: python3.12
-      Environment:
-        Variables:
-          REGION: !Ref Region
-          STAGE: !Ref Stage
-          TABLE_NAME: !Ref Table
-      Events:
-        ApiEvent:
-          Type: Api
-          Properties:
-            Path: /clients
-            Method: post
-            RestApiId:
-              Ref: AppointmentApi
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref AppointmentsTable
-      Layers:
-      - !Ref Services
-
-  ListClientsFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: handlers/clients/list_clients/
-      Handler: app.lambda_handler
-      Runtime: python3.12
-      Environment:
-        Variables:
-          REGION: !Ref Region
-          STAGE: !Ref Stage
-          TABLE_NAME: !Ref Table
-      Events:
-        ApiEvent:
-          Type: Api
-          Properties:
-            Path: /clients
+            Path: /users/{id}
             Method: get
             RestApiId:
               Ref: AppointmentApi
@@ -267,6 +292,14 @@ Resources:
       UserPoolId: !Ref CognitoUserPool
       ClientName: AppointmentUserPoolClient
       GenerateSecret: false
+
+  UserPoolUser:
+    Type: AWS::Cognito::UserPoolUser
+    Properties:
+      DesiredDeliveryMediums:
+        - EMAIL
+      Username: !Ref CognitoUserEmail
+      UserPoolId: !Ref CognitoUserPool
 
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group

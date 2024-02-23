@@ -1,9 +1,7 @@
-import boto3
-import os
-
 from boto3.dynamodb.conditions import Key
 
 from item import Item
+from table_util import get_dynamodb_table
 
 
 class User(Item):
@@ -40,3 +38,13 @@ class User(Item):
             "availability": self.availabilty,
             "item_type": "user"
         }
+
+def get_user(user_id):
+    table = get_dynamodb_table()
+
+    user_id_key = f"USER#{user_id}"
+    response = table.query(
+        KeyConditionExpression=Key("PK").eq(user_id_key)
+        & Key("range_key").eq(user_id_key)
+    )
+    return User(**response["Item"])

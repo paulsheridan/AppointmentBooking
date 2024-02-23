@@ -1,6 +1,11 @@
 
 # Created by https://www.gitignore.io/api/osx,linux,python,windows,pycharm,visualstudiocode
 
+#SAM#
+samconfig.toml
+.aws-sam
+.env
+
 ### Linux ###
 *~
 
