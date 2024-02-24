@@ -1,9 +1,7 @@
-import boto3
-import os
-
 from boto3.dynamodb.conditions import Key
 
 from item import Item
+from table_util import get_dynamodb_table
 
 
 class Client(Item):
@@ -53,58 +51,35 @@ class Client(Item):
             "over_18": self.over_18,
             "preferred_contact": self.preferred_contact,
             "phone_number": self.phone_number,
-            "item_type": "client"
+            "item_type": "client",
         }
 
 
 def create_client(client):
-    region = os.environ.get("REGION", "us-west-2")
-    aws_environment = os.environ.get("AWSENV", "dev")
-    table_name = os.environ.get("TABLE_NAME", "Appointments")
+    table = get_dynamodb_table()
 
-    if aws_environment == "AWS_SAM_LOCAL":
-        table_resource = boto3.resource("dynamodb", endpoint_url="http://dynamodb:8000")
-    else:
-        table_resource = boto3.resource("dynamodb", region_name=region)
-
-    table = table_resource.Table(table_name)
-
-    table.put_item(TableName=table_name, Item=client.to_item())
+    table.put_item(Item=client.to_item())
     return client
 
 
-def get_client(email):
-    region = os.environ.get("REGION", "us-west-2")
-    aws_environment = os.environ.get("AWSENV", "dev")
-    table_name = os.environ.get("TABLE_NAME", "Appointments")
+def get_client(user_id, email):
+    table = get_dynamodb_table()
 
-    if aws_environment == "AWS_SAM_LOCAL":
-        table_resource = boto3.resource("dynamodb", endpoint_url="http://dynamodb:8000")
-    else:
-        table_resource = boto3.resource("dynamodb", region_name=region)
-
-    table = table_resource.Table(table_name)
+    user_id_key = f"USER#{user_id}"
+    email_key = f"CLIENT#{email}"
 
     response = table.query(
-        KeyConditionExpression=Key("hash_key").eq(email) & Key("range_key").eq(email)
+        KeyConditionExpression=Key("hash_key").eq(user_id_key)
+        & Key("range_key").eq(email_key)
     )
     return Client(**response["Item"])
 
 
-def list_clients():
-    region = os.environ.get("REGION", "us-west-2")
-    aws_environment = os.environ.get("AWSENV", "dev")
-    table_name = os.environ.get("TABLE_NAME", "Appointments")
-
-    if aws_environment == "AWS_SAM_LOCAL":
-        table_resource = boto3.resource("dynamodb", endpoint_url="http://dynamodb:8000")
-    else:
-        table_resource = boto3.resource("dynamodb", region_name=region)
-
-    table = table_resource.Table(table_name)
+def list_clients(user_id):
+    table = get_dynamodb_table()
 
     response = table.query(
-        TableName=table_name,
-        KeyConditionExpression=Key('sk').begins_with("CLIENT#")
+        KeyConditionExpression=Key("hash_key").eq(user_id)
+        & Key("range_key").begins_with("CLIENT#"),
     )
     return [Client.from_item(item) for item in response["Items"]]

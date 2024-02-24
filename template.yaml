@@ -13,26 +13,26 @@ Globals:
       LogFormat: JSON
 
 Parameters:
-  Region:
-    Type: String
-    Default: us-west-2
   Stage:
     Type: String
     Default: Dev
     AllowedValues:
       - Dev
       - Prod
-  Table:
+  AppName:
     Type: String
     Default: Appointments
   CognitoUserEmail:
     Type: String
+  ClientDomains:
+    Type: CommaDelimitedList
+    Default: http://localhost:8080,localhost:8080
 
 Resources:
   AppointmentApi:
     Type: AWS::Serverless::Api
     Properties:
-      Name: !Sub "Appointment-API-${Stage}"
+      Name: !Sub "${AppName}-${Stage}-API"
       StageName: !Ref Stage
       TracingEnabled: true
       Cors: "'*'"
@@ -41,7 +41,58 @@ Resources:
           CognitoAuthorizer:
             UserPoolArn: !GetAtt CognitoUserPool.Arn
 
-  # CreateAppointmentFunction:
+  GetUser:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub GetUser-${Stage}
+      CodeUri: handlers/get_user/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Environment:
+        Variables:
+          STAGE: !Ref Stage
+      Events:
+        AppointmentApi:
+          Type: Api
+          Properties:
+            Path: /users/{id}
+            Method: get
+            RestApiId:
+              Ref: AppointmentApi
+            Auth:
+              Authorizer: CognitoAuthorizer
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AppointmentsTable
+      Layers:
+      - !Ref Services
+
+  ListClientsByUser:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ListClientsByUser-${Stage}
+      CodeUri: handlers/list_clients_by_user/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Environment:
+        Variables:
+          STAGE: !Ref Stage
+          TABLE_NAME: !Ref Table
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /clients
+            Method: get
+            RestApiId:
+              Ref: AppointmentApi
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AppointmentsTable
+      Layers:
+      - !Ref Services
+
+ # CreateAppointmentFunction:
   #   Type: AWS::Serverless::Function
   #   Properties:
   #     CodeUri: handlers/appointments/create_appointment/
@@ -49,7 +100,6 @@ Resources:
   #     Runtime: python3.12
   #     Environment:
   #       Variables:
-  #         REGION: !Ref Region
   #         STAGE: !Ref Stage
   #     Events:
   #       ApiEvent:
@@ -73,7 +123,6 @@ Resources:
   #     Runtime: python3.12
   #     Environment:
   #       Variables:
-  #         REGION: !Ref Region
   #         STAGE: !Ref Stage
   #     Events:
   #       AppointmentApi:
@@ -97,7 +146,6 @@ Resources:
   #     Runtime: python3.12
   #     Environment:
   #       Variables:
-  #         REGION: !Ref Region
   #         STAGE: !Ref Stage
   #     Events:
   #       AppointmentApi:
@@ -119,7 +167,6 @@ Resources:
   #     Runtime: python3.12
   #     Environment:
   #       Variables:
-  #         REGION: !Ref Region
   #         STAGE: !Ref Stage
   #     Events:
   #       AppointmentApi:
@@ -141,7 +188,6 @@ Resources:
   #     Runtime: python3.12
   #     Environment:
   #       Variables:
-  #         REGION: !Ref Region
   #         STAGE: !Ref Stage
   #     Events:
   #       AppointmentApi:
@@ -163,7 +209,6 @@ Resources:
   #     Runtime: python3.12
   #     Environment:
   #       Variables:
-  #         REGION: !Ref Region
   #         STAGE: !Ref Stage
   #         TABLE_NAME: !Ref Table
   #     Events:
@@ -180,55 +225,6 @@ Resources:
   #     Layers:
   #     - !Ref Services
 
-  # ListClientsFunction:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     CodeUri: handlers/clients/list_clients/
-  #     Handler: app.lambda_handler
-  #     Runtime: python3.12
-  #     Environment:
-  #       Variables:
-  #         REGION: !Ref Region
-  #         STAGE: !Ref Stage
-  #         TABLE_NAME: !Ref Table
-  #     Events:
-  #       ApiEvent:
-  #         Type: Api
-  #         Properties:
-  #           Path: /clients
-  #           Method: get
-  #           RestApiId:
-  #             Ref: AppointmentApi
-  #     Policies:
-  #       - DynamoDBCrudPolicy:
-  #           TableName: !Ref AppointmentsTable
-  #     Layers:
-  #     - !Ref Services
-
-  GetUserFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: handlers/users/get_user/
-      Handler: app.lambda_handler
-      Runtime: python3.12
-      Environment:
-        Variables:
-          REGION: !Ref Region
-          STAGE: !Ref Stage
-      Events:
-        AppointmentApi:
-          Type: Api
-          Properties:
-            Path: /users/{id}
-            Method: get
-            RestApiId:
-              Ref: AppointmentApi
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref AppointmentsTable
-      Layers:
-      - !Ref Services
-
   Services:
     Type: AWS::Serverless::LayerVersion
     Properties:
@@ -241,7 +237,7 @@ Resources:
   AppointmentsTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: "Appointments"
+      TableName: !Sub "${AppName}-${Stage}-Table"
       AttributeDefinitions:
         - AttributeName: "PK"
           AttributeType: "S"
@@ -265,20 +261,17 @@ Resources:
             KeyType: "RANGE"
           Projection:
             ProjectionType: ALL
-          ProvisionedThroughput:
-            ReadCapacityUnits: "1"
-            WriteCapacityUnits: "1"
-      ProvisionedThroughput:
-        ReadCapacityUnits: "1"
-        WriteCapacityUnits: "1"
+      BillingMode: PAY_PER_REQUEST
 
   CognitoUserPool:
     Type: AWS::Cognito::UserPool
     Properties:
-      UserPoolName: AppointmentUserPool
+      UserPoolName: !Sub "${AppName}-${Stage}-UserPool"
       Policies:
         PasswordPolicy:
           MinimumLength: 6
+      AutoVerifiedAttributes:
+        - email
       UsernameAttributes:
         - email
       Schema:
@@ -290,8 +283,26 @@ Resources:
     Type: AWS::Cognito::UserPoolClient
     Properties:
       UserPoolId: !Ref CognitoUserPool
-      ClientName: AppointmentUserPoolClient
+      ClientName: !Sub "${AppName}-${Stage}-UserPoolClient"
       GenerateSecret: false
+      SupportedIdentityProviders:
+        - COGNITO
+      CallbackURLs: !Ref ClientDomains
+      LogoutURLs: !Ref ClientDomains
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthFlows:
+        - code
+        - implicit
+      AllowedOAuthScopes:
+        - email
+        - openid
+        - profile
+
+  UserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: !Sub appointments-${AWS::AccountId}
+      UserPoolId: !Ref CognitoUserPool
 
   UserPoolUser:
     Type: AWS::Cognito::UserPoolUser
@@ -315,3 +326,15 @@ Resources:
       ResourceGroupName:
         Ref: ApplicationResourceGroup
       AutoConfigurationEnabled: 'true'
+
+Outputs:
+  UserPoolId:
+    Value: !Ref CognitoUserPool
+    Export:
+      Name: !Sub ${AppName}:UserPoolId
+
+  UserPoolClientId:
+    Value: !Ref CognitoUserPoolClient
+  AuthUrl:
+    Description: "URL for authentication"
+    Value: !Sub https://${UserPoolDomain}.auth.${AWS::Region}.amazoncognito.com

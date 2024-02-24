@@ -1,6 +1,3 @@
-import boto3
-import os
-import json
 from boto3.dynamodb.conditions import Key
 
 from item import Item

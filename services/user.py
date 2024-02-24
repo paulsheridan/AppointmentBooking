@@ -43,8 +43,9 @@ def get_user(user_id):
     table = get_dynamodb_table()
 
     user_id_key = f"USER#{user_id}"
+
     response = table.query(
-        KeyConditionExpression=Key("PK").eq(user_id_key)
+        KeyConditionExpression=Key("hash_key").eq(user_id_key)
         & Key("range_key").eq(user_id_key)
     )
     return User(**response["Item"])
