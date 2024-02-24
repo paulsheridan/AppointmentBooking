@@ -1,10 +1,9 @@
 import json
 
-from appointment import Appointment, create_appointment
+from client import Client, create_or_update_client
 
 
 def lambda_handler(message, context):
-
     if "body" not in message or message["httpMethod"] != "POST":
         return {
             "statusCode": 400,
@@ -13,8 +12,7 @@ def lambda_handler(message, context):
         }
 
     request_data = json.loads(message["body"])
-    appointment = Appointment(**request_data)
 
-    create_appointment(appointment)
-
-    return {"statusCode": 201, "headers": {}, "body": json.dumps(appointment.__dict__)}
+    client = Client(**request_data)
+    create_or_update_client(client)
+    return {"statusCode": 201, "headers": {}, "body": json.dumps(client.__dict__)}

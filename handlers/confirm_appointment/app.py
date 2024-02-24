@@ -1,6 +1,6 @@
 import json
 
-from client import Client, create_client
+from appointment import Appointment, update_appointment
 
 
 def lambda_handler(message, context):
@@ -11,8 +11,10 @@ def lambda_handler(message, context):
             "body": json.dumps({"msg": "Bad Request"}),
         }
 
-    request_data = json.loads(message["body"])
+    email = message["pathParameters"]["email"]
+    # TODO: Get the user_id from the request auth for use below
+    user_id = context["identity"]["cognitoIdentityId"]
 
-    client = Client(**request_data)
-    create_client(client)
+    appointment = Appointment(**request_data)
+
     return {"statusCode": 201, "headers": {}, "body": json.dumps(client.__dict__)}

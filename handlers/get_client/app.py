@@ -1,5 +1,3 @@
-import boto3
-import os
 import json
 from boto3.dynamodb.conditions import Key
 
@@ -16,7 +14,9 @@ def lambda_handler(message, context):
         }
 
     email = message["pathParameters"]["email"]
+    # TODO: Get the user_id from the request auth for use below
+    user_id = context["identity"]["cognitoIdentityId"]
 
-    client = get_client(email)
+    client = get_client(user_id, email)
 
     return {"statusCode": 200, "headers": {}, "body": json.dumps(client)}

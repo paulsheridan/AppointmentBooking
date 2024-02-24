@@ -55,7 +55,7 @@ class Client(Item):
         }
 
 
-def create_client(client):
+def create_or_update_client(client):
     table = get_dynamodb_table()
 
     table.put_item(Item=client.to_item())
@@ -63,11 +63,10 @@ def create_client(client):
 
 
 def get_client(user_id, email):
-    table = get_dynamodb_table()
-
     user_id_key = f"USER#{user_id}"
     email_key = f"CLIENT#{email}"
 
+    table = get_dynamodb_table()
     response = table.query(
         KeyConditionExpression=Key("hash_key").eq(user_id_key)
         & Key("range_key").eq(email_key)
@@ -77,7 +76,6 @@ def get_client(user_id, email):
 
 def list_clients(user_id):
     table = get_dynamodb_table()
-
     response = table.query(
         KeyConditionExpression=Key("hash_key").eq(user_id)
         & Key("range_key").begins_with("CLIENT#"),
