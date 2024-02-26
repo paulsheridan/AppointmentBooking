@@ -63,15 +63,11 @@ def get_appointment(user_id, start_datetime):
     return Appointment(**response["Item"])
 
 
-def update_appointment(user_id, start_datetime):
+def confirm_appointment(user_id, start_datetime):
     user_id_key = f"USER#{user_id}"
     start_datetime_key = f"APPT#{start_datetime}"
 
     table = get_dynamodb_table()
-    response = table.query(
-        KeyConditionExpression=Key("hash_key").eq(user_id_key)
-        & Key("range_key").eq(start_datetime_key)
-    )
     response = table.update_item(
         KeyConditionExpression=Key("hash_key").eq(user_id_key)
         & Key("range_key").eq(start_datetime_key),
