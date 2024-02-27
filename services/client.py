@@ -68,16 +68,15 @@ def get_client(user_id, email):
 
     table = get_dynamodb_table()
     response = table.query(
-        KeyConditionExpression=Key("hash_key").eq(user_id_key)
-        & Key("range_key").eq(email_key)
+        KeyConditionExpression=Key("PK").eq(user_id_key) & Key("SK").eq(email_key)
     )
     return Client(**response["Item"])
 
 
 def list_clients(user_id):
     table = get_dynamodb_table()
+
     response = table.query(
-        KeyConditionExpression=Key("hash_key").eq(user_id)
-        & Key("range_key").begins_with("CLIENT#"),
+        KeyConditionExpression=Key("PK").eq(user_id) & Key("SK").begins_with("CLIENT#"),
     )
     return [Client.from_item(item) for item in response["Items"]]

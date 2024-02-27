@@ -19,7 +19,7 @@ class User(Item):
             item["username"],
             item["email"],
             item["date_created"],
-            item["availability"]
+            item["availability"],
         )
 
     def pk(self):
@@ -36,8 +36,9 @@ class User(Item):
             "email": self.email,
             "date_created": self.date_created,
             "availability": self.availabilty,
-            "item_type": "user"
+            "item_type": "user",
         }
+
 
 def get_user(user_id):
     table = get_dynamodb_table()
@@ -45,7 +46,6 @@ def get_user(user_id):
     user_id_key = f"USER#{user_id}"
 
     response = table.query(
-        KeyConditionExpression=Key("hash_key").eq(user_id_key)
-        & Key("range_key").eq(user_id_key)
+        KeyConditionExpression=Key("PK").eq(user_id_key) & Key("SK").eq(user_id_key)
     )
     return User(**response["Item"])

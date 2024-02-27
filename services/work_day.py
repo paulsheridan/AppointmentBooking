@@ -29,5 +29,5 @@ class WorkDay(Item):
             "user_id": self.user_id,
             "date": self.date,
             "time_slots": self.time_slots,
-            "item_type": "work_day"
+            "item_type": "work_day",
         }

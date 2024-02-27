@@ -3,7 +3,7 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   python3.12
 
-  Sample SAM Template for Appointment Appointment
+  Sample SAM Template for Appointment Bookings
 
 Globals:
   Function:
@@ -15,15 +15,18 @@ Globals:
 Parameters:
   Stage:
     Type: String
-    Default: Dev
+    Default: dev
     AllowedValues:
-      - Dev
-      - Prod
+      - dev
+      - prod
   AppName:
     Type: String
     Default: Appointments
   CognitoUserEmail:
     Type: String
+  TableName:
+    Type: String
+    Default: Appointments-Table-dev
   ClientDomains:
     Type: CommaDelimitedList
     Default: http://localhost:8080,localhost:8080
@@ -32,10 +35,13 @@ Resources:
   AppointmentApi:
     Type: AWS::Serverless::Api
     Properties:
-      Name: !Sub "${AppName}-${Stage}-API"
+      Name: !Sub "${AppName}-API-${Stage}"
       StageName: !Ref Stage
       TracingEnabled: true
-      Cors: "'*'"
+      Cors:
+        AllowMethods: "'*'"
+        AllowHeaders: "'*'"
+        AllowOrigin: "'*'"
       Auth:
         Authorizers:
           CognitoAuthorizer:
@@ -67,31 +73,6 @@ Resources:
       Layers:
       - !Ref Services
 
-  ListClientsByUser:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: !Sub ListClientsByUser-${Stage}
-      CodeUri: handlers/list_clients_by_user/
-      Handler: app.lambda_handler
-      Runtime: python3.12
-      Environment:
-        Variables:
-          STAGE: !Ref Stage
-          TABLE_NAME: !Ref Table
-      Events:
-        ApiEvent:
-          Type: Api
-          Properties:
-            Path: /clients
-            Method: get
-            RestApiId:
-              Ref: AppointmentApi
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref AppointmentsTable
-      Layers:
-      - !Ref Services
-
   RequestAppointment:
     Type: AWS::Serverless::Function
     Properties:
@@ -110,55 +91,13 @@ Resources:
             Method: post
             RestApiId:
               Ref: AppointmentApi
+            Auth:
+              Authorizer: CognitoAuthorizer
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref AppointmentsTable
       Layers:
       - !Ref Services
-
-  # GetAppointmentFunction:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     CodeUri: handlers/appointments/get_appointment/
-  #     Handler: app.lambda_handler
-  #     Runtime: python3.12
-  #     Environment:
-  #       Variables:
-  #         STAGE: !Ref Stage
-  #     Events:
-  #       AppointmentApi:
-  #         Type: Api
-  #         Properties:
-  #           Path: /appointments/{id}
-  #           Method: get
-  #           RestApiId:
-  #             Ref: AppointmentApi
-  #     Policies:
-  #       - DynamoDBCrudPolicy:
-  #           TableName: !Ref AppointmentsTable
-  #     Layers:
-  #     - !Ref Services
-
-  # ListAppointmentsFunction:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     CodeUri: handlers/appointments/list_appointments/
-  #     Handler: app.lambda_handler
-  #     Runtime: python3.12
-  #     Environment:
-  #       Variables:
-  #         STAGE: !Ref Stage
-  #     Events:
-  #       AppointmentApi:
-  #         Type: Api
-  #         Properties:
-  #           Path: /appointments
-  #           Method: get
-  #           RestApiId:
-  #             Ref: AppointmentApi
-  #     Policies:
-  #       - DynamoDBCrudPolicy:
-  #           TableName: !Ref AppointmentsTable
 
   ConfirmAppointment:
     Type: AWS::Serverless::Function
@@ -174,13 +113,17 @@ Resources:
         AppointmentApi:
           Type: Api
           Properties:
-            Path: /appointments/{id}
+            Path: /appointments/{id}/confirm
             Method: patch
             RestApiId:
               Ref: AppointmentApi
+            Auth:
+              Authorizer: CognitoAuthorizer
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref AppointmentsTable
+      Layers:
+      - !Ref Services
 
   CancelAppointment:
     Type: AWS::Serverless::Function
@@ -196,13 +139,17 @@ Resources:
         AppointmentApi:
           Type: Api
           Properties:
-            Path: /appointments/{id}
+            Path: /appointments/{id}/
             Method: delete
             RestApiId:
               Ref: AppointmentApi
+            Auth:
+              Authorizer: CognitoAuthorizer
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref AppointmentsTable
+      Layers:
+      - !Ref Services
 
   CreateClient:
     Type: AWS::Serverless::Function
@@ -214,7 +161,6 @@ Resources:
       Environment:
         Variables:
           STAGE: !Ref Stage
-          TABLE_NAME: !Ref Table
       Events:
         ApiEvent:
           Type: Api
@@ -223,6 +169,8 @@ Resources:
             Method: post
             RestApiId:
               Ref: AppointmentApi
+            Auth:
+              Authorizer: CognitoAuthorizer
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref AppointmentsTable
@@ -239,7 +187,33 @@ Resources:
       Environment:
         Variables:
           STAGE: !Ref Stage
-          TABLE_NAME: !Ref Table
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /clients/{id}
+            Method: get
+            RestApiId:
+              Ref: AppointmentApi
+            Auth:
+              Authorizer: CognitoAuthorizer
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AppointmentsTable
+      Layers:
+      - !Ref Services
+
+  ListUserClients:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ListUserClients-${Stage}
+      CodeUri: handlers/list_user_clients/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Environment:
+        Variables:
+          STAGE: !Ref Stage
+          TABLE_NAME: !Ref TableName
       Events:
         ApiEvent:
           Type: Api
@@ -248,6 +222,8 @@ Resources:
             Method: get
             RestApiId:
               Ref: AppointmentApi
+            Auth:
+              Authorizer: CognitoAuthorizer
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref AppointmentsTable
@@ -266,7 +242,7 @@ Resources:
   AppointmentsTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: !Sub "${AppName}-${Stage}-Table"
+      TableName: !Ref TableName
       AttributeDefinitions:
         - AttributeName: "PK"
           AttributeType: "S"
@@ -295,7 +271,7 @@ Resources:
   CognitoUserPool:
     Type: AWS::Cognito::UserPool
     Properties:
-      UserPoolName: !Sub "${AppName}-${Stage}-UserPool"
+      UserPoolName: !Sub "${AppName}-UserPool-${Stage}"
       Policies:
         PasswordPolicy:
           MinimumLength: 6
@@ -312,7 +288,7 @@ Resources:
     Type: AWS::Cognito::UserPoolClient
     Properties:
       UserPoolId: !Ref CognitoUserPool
-      ClientName: !Sub "${AppName}-${Stage}-UserPoolClient"
+      ClientName: !Sub "${AppName}-UserPoolClient-${Stage}"
       GenerateSecret: false
       SupportedIdentityProviders:
         - COGNITO
@@ -330,7 +306,7 @@ Resources:
   UserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
     Properties:
-      Domain: !Sub appointments-${AWS::AccountId}
+      Domain: !Sub appointments-${AWS::AccountId}-${Stage}
       UserPoolId: !Ref CognitoUserPool
 
   UserPoolUser:

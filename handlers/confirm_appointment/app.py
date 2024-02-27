@@ -1,6 +1,6 @@
 import json
 
-from appointment import Appointment, confirm_appointment
+from appointment import confirm_appointment
 
 
 def lambda_handler(message, context):
@@ -11,8 +11,7 @@ def lambda_handler(message, context):
             "body": json.dumps({"msg": "Bad Request"}),
         }
 
-    # TODO: Get the user_id from the request auth for use below
-    user_id = context["identity"]["cognitoIdentityId"]
+    user_id = message["requestContext"]["authorizer"]["claims"]["sub"]
     start_datetime = message["pathParameters"]["start_datetime"]
 
     response = confirm_appointment(user_id, start_datetime)

@@ -1,6 +1,7 @@
 import boto3
 import os
 
+
 def get_dynamodb_table():
     region = os.environ.get("AWS_REGION")
     aws_environment = os.environ.get("AWSENV")

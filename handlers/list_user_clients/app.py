@@ -1,6 +1,6 @@
 import json
 
-from client import Client, list_clients
+from client import list_clients
 
 
 def lambda_handler(message, context):
@@ -12,7 +12,9 @@ def lambda_handler(message, context):
             "body": json.dumps({"msg": "Bad Request"}),
         }
 
-    clients = list_clients()
+    user_id = message["requestContext"]["authorizer"]["claims"]["sub"]
+
+    clients = list_clients(user_id)
     return {
         "statusCode": 200,
         "headers": {},

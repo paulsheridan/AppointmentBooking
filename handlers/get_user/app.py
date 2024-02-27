@@ -1,9 +1,6 @@
-import boto3
-import os
 import json
-from boto3.dynamodb.conditions import Key
 
-from user import User, get_user
+from user import get_user
 
 
 def lambda_handler(message, context):
@@ -15,7 +12,7 @@ def lambda_handler(message, context):
             "body": json.dumps({"msg": "Bad Request"}),
         }
 
-    user_id = message["pathParameters"]["user_id"]
+    user_id = message["requestContext"]["authorizer"]["claims"]["sub"]
     user = get_user(user_id)
 
     return {"statusCode": 200, "headers": {}, "body": json.dumps(user)}
