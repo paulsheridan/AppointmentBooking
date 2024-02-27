@@ -57,11 +57,12 @@ Resources:
       Environment:
         Variables:
           STAGE: !Ref Stage
+          TABLE_NAME: !Ref TableName
       Events:
         AppointmentApi:
           Type: Api
           Properties:
-            Path: /users/{id}
+            Path: /users
             Method: get
             RestApiId:
               Ref: AppointmentApi
@@ -83,6 +84,7 @@ Resources:
       Environment:
         Variables:
           STAGE: !Ref Stage
+          TABLE_NAME: !Ref TableName
       Events:
         ApiEvent:
           Type: Api
@@ -109,6 +111,7 @@ Resources:
       Environment:
         Variables:
           STAGE: !Ref Stage
+          TABLE_NAME: !Ref TableName
       Events:
         AppointmentApi:
           Type: Api
@@ -135,6 +138,7 @@ Resources:
       Environment:
         Variables:
           STAGE: !Ref Stage
+          TABLE_NAME: !Ref TableName
       Events:
         AppointmentApi:
           Type: Api
@@ -161,6 +165,7 @@ Resources:
       Environment:
         Variables:
           STAGE: !Ref Stage
+          TABLE_NAME: !Ref TableName
       Events:
         ApiEvent:
           Type: Api
@@ -187,6 +192,7 @@ Resources:
       Environment:
         Variables:
           STAGE: !Ref Stage
+          TABLE_NAME: !Ref TableName
       Events:
         ApiEvent:
           Type: Api
@@ -203,11 +209,11 @@ Resources:
       Layers:
       - !Ref Services
 
-  ListUserClients:
+  ListClients:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub ListUserClients-${Stage}
-      CodeUri: handlers/list_user_clients/
+      FunctionName: !Sub ListClients-${Stage}
+      CodeUri: handlers/list_clients/
       Handler: app.lambda_handler
       Runtime: python3.12
       Environment:
@@ -280,9 +286,36 @@ Resources:
       UsernameAttributes:
         - email
       Schema:
-        - AttributeDataType: String
-          Name: email
+        - Name: email
           Required: false
+          AttributeDataType: String
+        - Name: "studio"
+          Required: false
+          Mutable: true
+          AttributeDataType: String
+
+  PostConfirmation:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub PostConfirmation-${Stage}
+      CodeUri: handlers/auth_workflow/post_confirmation
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Environment:
+        Variables:
+          STAGE: !Ref Stage
+          TABLE_NAME: !Ref TableName
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AppointmentsTable
+      Layers:
+      - !Ref Services
+      Events:
+        CognitoTrigger:
+          Type: Cognito
+          Properties:
+            Trigger: PostConfirmation
+            UserPool: !Ref CognitoUserPool
 
   CognitoUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
@@ -309,13 +342,13 @@ Resources:
       Domain: !Sub appointments-${AWS::AccountId}-${Stage}
       UserPoolId: !Ref CognitoUserPool
 
-  UserPoolUser:
-    Type: AWS::Cognito::UserPoolUser
-    Properties:
-      DesiredDeliveryMediums:
-        - EMAIL
-      Username: !Ref CognitoUserEmail
-      UserPoolId: !Ref CognitoUserPool
+  # MyLambdaInvocationPermission:
+  #   Type: AWS::Lambda::Permission
+  #   Properties:
+  #     Action: lambda:InvokeFunction
+  #     FunctionName: !GetAtt MyLambdaFunctionName.Arn
+  #     Principal: cognito-idp.amazonaws.com
+  #     SourceArn: !GetAtt MyCognitoUserPoolName.Arn
 
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group

@@ -49,3 +49,7 @@ def get_user(user_id):
         KeyConditionExpression=Key("PK").eq(user_id_key) & Key("SK").eq(user_id_key)
     )
     return User(**response["Item"])
+
+
+def create_user(user):
+    pass
