@@ -1,12 +1,4 @@
 {
-    "user_id": "12345",
-    "name": "Tatters Tattooist",
-    "username": "tattoo_artist",
-    "email": "tatters.tattooist@example.com"
-}
-
-
-{
     "email": "paul.clientman@email.com",
     "name": "Paul Clientman",
     "pronouns": "he-him",

@@ -10,9 +10,10 @@ def lambda_handler(message, context):
             "headers": {},
             "body": json.dumps({"msg": "Bad Request"}),
         }
+    user_id = message["requestContext"]["authorizer"]["claims"]["sub"]
 
     request_data = json.loads(message["body"])
 
-    client = Client(**request_data)
+    client = Client(user_id, **request_data)
     create_or_update_client(client)
     return {"statusCode": 201, "headers": {}, "body": json.dumps(client.__dict__)}

@@ -288,11 +288,15 @@ Resources:
       Schema:
         - Name: email
           Required: false
-          AttributeDataType: String
-        - Name: "studio"
-          Required: false
+        - Name: "family_name"
+          Required: true
           Mutable: true
-          AttributeDataType: String
+        - Name: "given_name"
+          Required: true
+          Mutable: true
+        - Name: "nickname"
+          Required: true
+          Mutable: true
 
   PostConfirmation:
     Type: AWS::Serverless::Function
@@ -342,14 +346,6 @@ Resources:
       Domain: !Sub appointments-${AWS::AccountId}-${Stage}
       UserPoolId: !Ref CognitoUserPool
 
-  # MyLambdaInvocationPermission:
-  #   Type: AWS::Lambda::Permission
-  #   Properties:
-  #     Action: lambda:InvokeFunction
-  #     FunctionName: !GetAtt MyLambdaFunctionName.Arn
-  #     Principal: cognito-idp.amazonaws.com
-  #     SourceArn: !GetAtt MyCognitoUserPoolName.Arn
-
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group
     Properties:
@@ -366,11 +362,13 @@ Resources:
       AutoConfigurationEnabled: 'true'
 
 Outputs:
+  AppointmentApi:
+    Description: "API Gateway endpoint URL for Prod stage for Create Appointment Function"
+    Value: !Sub "https://${AppointmentApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
   UserPoolId:
     Value: !Ref CognitoUserPool
     Export:
       Name: !Sub ${AppName}:UserPoolId
-
   UserPoolClientId:
     Value: !Ref CognitoUserPoolClient
   AuthUrl:

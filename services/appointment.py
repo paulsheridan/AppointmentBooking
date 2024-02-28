@@ -8,15 +8,15 @@ class Appointment(Item):
 
     def __init__(
         self,
-        client_email,
         user_id,
+        client_email,
         start_datetime,
         end_datetime,
         confirmed=False,
         canceled=False,
     ):
-        self.client_email = client_email
         self.user_id = user_id
+        self.client_email = client_email
         self.start_datetime = start_datetime
         self.end_datetime = end_datetime
         self.confirmed = confirmed
@@ -25,8 +25,8 @@ class Appointment(Item):
     @classmethod
     def from_item(cls, item):
         return cls(
-            item["client_email"],
             item["user_id"],
+            item["client_email"],
             item["start_datetime"],
             item["end_datetime"],
             item["confirmed"],
@@ -42,8 +42,8 @@ class Appointment(Item):
     def to_item(self):
         return {
             **self.keys(),
-            "client_email": self.client_email,
             "user_id": self.user_id,
+            "client_email": self.client_email,
             "start_datetime": self.start_datetime,
             "end_datetime": self.end_datetime,
             "confirmed": self.confirmed,

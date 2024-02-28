@@ -7,16 +7,16 @@ from table_util import get_dynamodb_table
 class Client(Item):
     def __init__(
         self,
-        email,
         user_id,
+        email,
         name,
         pronouns,
         over_18,
         preferred_contact,
         phone_number,
     ):
-        self.email = email
         self.user_id = user_id
+        self.email = email
         self.name = name
         self.pronouns = pronouns
         self.over_18 = over_18
@@ -26,8 +26,8 @@ class Client(Item):
     @classmethod
     def from_item(cls, item):
         return cls(
-            item["email"],
             item["user_id"],
+            item["email"],
             item["name"],
             item["pronouns"],
             item["over_18"],
@@ -44,8 +44,8 @@ class Client(Item):
     def to_item(self):
         return {
             **self.keys(),
-            "email": self.email,
             "user_id": self.user_id,
+            "email": self.email,
             "name": self.name,
             "pronouns": self.pronouns,
             "over_18": self.over_18,

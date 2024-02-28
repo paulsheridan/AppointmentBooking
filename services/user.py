@@ -35,7 +35,7 @@ class User(Item):
             "username": self.username,
             "email": self.email,
             "date_created": self.date_created,
-            "availability": self.availabilty,
+            "availability": self.availability,
             "item_type": "user",
         }
 
@@ -44,12 +44,15 @@ def get_user(user_id):
     table = get_dynamodb_table()
 
     user_id_key = f"USER#{user_id}"
-
     response = table.query(
         KeyConditionExpression=Key("PK").eq(user_id_key) & Key("SK").eq(user_id_key)
     )
-    return User(**response["Item"])
+    print(response)
+    return User.from_item(response["Items"][0])
 
 
-def create_user(user):
-    pass
+def create_or_update_user(user):
+    table = get_dynamodb_table()
+
+    table.put_item(Item=user.to_item())
+    return user
