@@ -5,14 +5,6 @@ from client import Client, create_or_update_client
 
 
 def lambda_handler(message, context):
-
-    if "body" not in message or message["httpMethod"] != "POST":
-        return {
-            "statusCode": 400,
-            "headers": {},
-            "body": json.dumps({"msg": "Bad Request"}),
-        }
-
     # TODO: get availability and verify that the time slot is open
     # TODO: if it's available, remove the time slot that has been requested, then continue
 
@@ -38,5 +30,8 @@ def lambda_handler(message, context):
     create_or_update_client(client)
     create_unconfirmed_appointment(appointment)
 
-    # TODO: Return the client as well
-    return {"statusCode": 201, "headers": {}, "body": json.dumps(appointment.__dict__)}
+    response_data = {
+        "appointment": appointment.__dict__,
+        "client": client.__dict__,
+    }
+    return {"statusCode": 201, "headers": {}, "body": json.dumps(response_data)}

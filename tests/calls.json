@@ -47,3 +47,15 @@
     "start_datetime": "12:34:56.000000",
     "end_datetime": "12:34:56.000000"
 }
+
+{
+    "user_id": "30b73336-29c0-482f-8e88-4cf9b115cdff",
+    "client_email": "bigbadbob@email.com",
+    "name": "Bob McAffee",
+    "pronouns": "he-him",
+    "over_18": true,
+    "preferred_contact": "phone",
+    "phone_number": "999-999-9999",
+    "start_datetime": "2024-04-06T02:15",
+    "end_datetime": "2024-04-06T04:15"
+}
