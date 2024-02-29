@@ -1,10 +1,10 @@
 import json
 
-from appointment import confirm_appointment
+from appointment import patch_appointment_status
 
 
 def lambda_handler(message, context):
-    if "body" not in message or message["httpMethod"] != "POST":
+    if "body" not in message or message["httpMethod"] != "PATCH":
         return {
             "statusCode": 400,
             "headers": {},
@@ -12,8 +12,12 @@ def lambda_handler(message, context):
         }
 
     user_id = message["requestContext"]["authorizer"]["claims"]["sub"]
-    start_datetime = message["pathParameters"]["start_datetime"]
+    start = message["pathParameters"]["id"]
 
-    response = confirm_appointment(user_id, start_datetime)
+    response = patch_appointment_status(user_id, start, True, False)
 
-    return {"statusCode": 201, "headers": {}, "body": json.dumps(response)}
+    return {
+        "statusCode": 201,
+        "headers": {},
+        "body": json.dumps(response["Attributes"]),
+    }

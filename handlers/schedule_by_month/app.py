@@ -1,6 +1,6 @@
 import json
 
-from client import list_clients
+from appointment import list_schedule
 
 
 def lambda_handler(message, context):
@@ -13,10 +13,18 @@ def lambda_handler(message, context):
         }
 
     user_id = message["requestContext"]["authorizer"]["claims"]["sub"]
-    clients = list_clients(user_id)
+    month = message["pathParameters"]["month"]
+
+    start = f"{month}-00"
+    end = f"{month}-31"
+
+    appointments = list_schedule(user_id, start, end)
+
+    print("appointments")
+    print(appointments)
 
     return {
         "statusCode": 200,
         "headers": {},
-        "body": json.dumps([client.__dict__ for client in clients]),
+        "body": json.dumps([appointment.__dict__ for appointment in appointments]),
     }

@@ -93,6 +93,31 @@ Resources:
             Method: post
             RestApiId:
               Ref: AppointmentApi
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AppointmentsTable
+      Layers:
+      - !Ref Services
+
+  GetScheduleByMonth:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub GetScheduleByMonth-${Stage}
+      CodeUri: handlers/schedule_by_month/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Environment:
+        Variables:
+          STAGE: !Ref Stage
+          TABLE_NAME: !Ref TableName
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /schedule/{month}
+            Method: get
+            RestApiId:
+              Ref: AppointmentApi
             Auth:
               Authorizer: CognitoAuthorizer
       Policies:
@@ -143,8 +168,8 @@ Resources:
         AppointmentApi:
           Type: Api
           Properties:
-            Path: /appointments/{id}/
-            Method: delete
+            Path: /appointments/{id}/cancel
+            Method: patch
             RestApiId:
               Ref: AppointmentApi
             Auth:
@@ -197,7 +222,7 @@ Resources:
         ApiEvent:
           Type: Api
           Properties:
-            Path: /clients/{id}
+            Path: /clients/{email}
             Method: get
             RestApiId:
               Ref: AppointmentApi

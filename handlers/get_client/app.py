@@ -15,6 +15,10 @@ def lambda_handler(message, context):
     user_id = message["requestContext"]["authorizer"]["claims"]["sub"]
     email = message["pathParameters"]["email"]
 
-    client = get_client(user_id, email)
+    clients = get_client(user_id, email)
 
-    return {"statusCode": 200, "headers": {}, "body": json.dumps(client)}
+    return {
+        "statusCode": 200,
+        "headers": {},
+        "body": json.dumps([client.__dict__ for client in clients]),
+    }

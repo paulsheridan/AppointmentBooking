@@ -2,6 +2,7 @@ from boto3.dynamodb.conditions import Key
 
 from item import Item
 from table_util import get_dynamodb_table
+from datetime_util import datetime_valid
 
 
 class Appointment(Item):
@@ -62,42 +63,29 @@ def create_unconfirmed_appointment(appointment):
 
 
 def get_appointment(user_id, start_datetime):
-    user_id_key = f"USER#{user_id}"
-    start_datetime_key = f"APPT#{start_datetime}"
-
     table = get_dynamodb_table()
     response = table.query(
-        KeyConditionExpression=Key("PK").eq(user_id_key)
-        & Key("SK").eq(start_datetime_key)
+        KeyConditionExpression=Key("PK").eq(f"USER#{user_id}")
+        & Key("SK").eq(f"APPT#{start_datetime}")
     )
     return Appointment(**response["Item"])
 
 
-def confirm_appointment(user_id, start_datetime):
-    user_id_key = f"USER#{user_id}"
-    start_datetime_key = f"APPT#{start_datetime}"
-
+def list_schedule(user_id, start, end):
     table = get_dynamodb_table()
-    response = table.update_item(
-        KeyConditionExpression=Key("PK").eq(user_id_key)
-        & Key("SK").eq(start_datetime_key),
-        UpdateExpression="SET Confirmed=:confirmed, Canceled=:canceled",
-        ExpressionAttributeValues={":confirmed": True, ":canceled": False},
-        ReturnValues="UPDATED_NEW",
+    response = table.query(
+        KeyConditionExpression=Key("PK").eq(f"USER#{user_id}")
+        & Key("SK").between(f"APPT#{start}", f"APPT#{end}")
     )
-    return response
+    return [Appointment.from_item(item) for item in response["Items"]]
 
 
-def cancel_appointment(user_id, start_datetime):
-    user_id_key = f"USER#{user_id}"
-    start_datetime_key = f"APPT#{start_datetime}"
-
+def patch_appointment_status(user_id, start_datetime, confirmed, canceled):
     table = get_dynamodb_table()
     response = table.update_item(
-        KeyConditionExpression=Key("PK").eq(user_id_key)
-        & Key("SK").eq(start_datetime_key),
-        UpdateExpression="SET Confirmed=:confirmed, Canceled=:canceled",
-        ExpressionAttributeValues={":confirmed": False, ":canceled": True},
+        Key={"PK": f"USER#{user_id}", "SK": f"APPT#{start_datetime}"},
+        UpdateExpression="SET confirmed=:confirmed, canceled=:canceled",
+        ExpressionAttributeValues={":confirmed": confirmed, ":canceled": canceled},
         ReturnValues="UPDATED_NEW",
     )
     return response

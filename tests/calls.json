@@ -36,3 +36,14 @@
     "start_datetime": "12:34:56.000000",
     "end_datetime": "12:34:56.000000"
 }
+
+{
+    "email": "jeff.smandersond@email.com",
+    "name": "Jeff Smanderson",
+    "pronouns": "he-him",
+    "over_18": true,
+    "preferred_contact": "email",
+    "phone_number": "999-999-9999",
+    "start_datetime": "12:34:56.000000",
+    "end_datetime": "12:34:56.000000"
+}
