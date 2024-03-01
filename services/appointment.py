@@ -1,27 +1,27 @@
+from pydantic import EmailStr, validator, field_serializer
+from uuid import UUID
+from datetime import datetime
 from boto3.dynamodb.conditions import Key
 
 from item import Item
 from table_util import get_dynamodb_table
-from datetime_util import datetime_valid
 
 
 class Appointment(Item):
+    user_id: UUID
+    client_email: EmailStr
+    start_datetime: datetime
+    end_datetime: datetime
+    confirmed: bool = False
+    canceled: bool = False
 
-    def __init__(
-        self,
-        user_id,
-        client_email,
-        start_datetime,
-        end_datetime,
-        confirmed=False,
-        canceled=False,
-    ):
-        self.user_id = user_id
-        self.client_email = client_email
-        self.start_datetime = start_datetime
-        self.end_datetime = end_datetime
-        self.confirmed = confirmed
-        self.canceled = canceled
+    @field_serializer('user_id')
+    def serialize_uuid(self, user_id: UUID):
+        return str(user_id)
+
+    @field_serializer('start_datetime', 'end_datetime')
+    def serialize_datetime(self, datetime: datetime):
+        return datetime.isoformat()
 
     @classmethod
     def from_item(cls, item):
@@ -68,7 +68,7 @@ def get_appointment(user_id, start_datetime):
         KeyConditionExpression=Key("PK").eq(f"USER#{user_id}")
         & Key("SK").eq(f"APPT#{start_datetime}")
     )
-    return [Appointment.from_item(item) for item in response["Items"]]
+    return [Appointment(**item) for item in response["Items"]]
 
 
 def list_schedule(user_id, start, end):

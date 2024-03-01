@@ -1,8 +1,8 @@
-import json
-from abc import ABC, abstractmethod
+from pydantic import BaseModel
+from abc import abstractmethod
 
 
-class Item(ABC):
+class Item(BaseModel):
 
     @abstractmethod
     def pk():
@@ -18,6 +18,3 @@ class Item(ABC):
     @abstractmethod
     def to_item():
         pass
-
-    def toJSON(self):
-        return json.dumps(self, default=lambda obj: obj.__dict__)

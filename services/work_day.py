@@ -1,13 +1,12 @@
-from boto3.dynamodb.conditions import Key
+from uuid import UUID
+from datetime import date
 
 from item import Item
 
-
 class WorkDay(Item):
-    def __init__(self, user_id, date, time_slots):
-        self.user_id = user_id
-        self.date = date
-        self.time_slots = time_slots
+    user_id: UUID
+    date = date
+    time_slots = dict
 
     @classmethod
     def from_item(cls, item):

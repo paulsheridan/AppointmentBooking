@@ -1,16 +1,20 @@
+from pydantic import EmailStr
+from typing import List
+from uuid import UUID
+from datetime import datetime
 from boto3.dynamodb.conditions import Key
 
 from item import Item
+from work_day import WorkDay
 from table_util import get_dynamodb_table
 
 
 class User(Item):
-    def __init__(self, user_id, username, email, date_created, availability):
-        self.user_id = user_id
-        self.username = username
-        self.email = email
-        self.date_created = date_created
-        self.availability = availability
+    user_id: UUID
+    username: str
+    email: EmailStr
+    date_created: datetime
+    availability: List[WorkDay]
 
     @classmethod
     def from_item(cls, item):

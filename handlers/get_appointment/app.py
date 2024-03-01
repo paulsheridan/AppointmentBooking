@@ -8,8 +8,10 @@ def lambda_handler(message, context):
     start = message["pathParameters"]["id"]
 
     appointments = get_appointment(user_id, start)
+    native = [appointment.dict() for appointment in appointments]
+    print(native)
     return {
         "statusCode": 200,
         "headers": {},
-        "body": json.dumps([appointment.__dict__ for appointment in appointments]),
+        "body": json.dumps(native),
     }

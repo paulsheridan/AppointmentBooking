@@ -1,3 +1,5 @@
+from pydantic import EmailStr, PhoneNumber
+from uuid import UUID
 from boto3.dynamodb.conditions import Key
 
 from item import Item
@@ -5,23 +7,13 @@ from table_util import get_dynamodb_table
 
 
 class Client(Item):
-    def __init__(
-        self,
-        user_id,
-        email,
-        name,
-        pronouns,
-        over_18,
-        preferred_contact,
-        phone_number,
-    ):
-        self.user_id = user_id
-        self.email = email
-        self.name = name
-        self.pronouns = pronouns
-        self.over_18 = over_18
-        self.preferred_contact = preferred_contact
-        self.phone_number = phone_number
+    user_id: UUID
+    email: EmailStr
+    name: str
+    pronouns: str
+    over_18: bool
+    preferred_contact: str
+    phone_number: PhoneNumber
 
     @classmethod
     def from_item(cls, item):
