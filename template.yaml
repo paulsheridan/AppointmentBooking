@@ -415,14 +415,11 @@ Resources:
 
 Outputs:
   AppointmentApi:
-    Description: "API Gateway endpoint URL for Prod stage for Create Appointment Function"
+    Description: "API Gateway endpoint URL"
     Value: !Sub "https://${AppointmentApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
-  UserPoolId:
-    Value: !Ref CognitoUserPool
-    Export:
-      Name: !Sub ${AppName}:UserPoolId
   UserPoolClientId:
+    Description: "User Pool Client ID"
     Value: !Ref CognitoUserPoolClient
   AuthUrl:
-    Description: "URL for authentication"
+    Description: "Authentication URL"
     Value: !Sub https://${UserPoolDomain}.auth.${AWS::Region}.amazoncognito.com
