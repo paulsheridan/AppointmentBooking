@@ -74,6 +74,33 @@ Resources:
       Layers:
       - !Ref Services
 
+  GetAppointment:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub GetAppointment-${Stage}
+      CodeUri: handlers/get_appointment/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Environment:
+        Variables:
+          STAGE: !Ref Stage
+          TABLE_NAME: !Ref TableName
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /appointments/{id}
+            Method: get
+            RestApiId:
+              Ref: AppointmentApi
+            Auth:
+              Authorizer: CognitoAuthorizer
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AppointmentsTable
+      Layers:
+      - !Ref Services
+
   RequestAppointment:
     Type: AWS::Serverless::Function
     Properties:

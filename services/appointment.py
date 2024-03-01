@@ -68,7 +68,7 @@ def get_appointment(user_id, start_datetime):
         KeyConditionExpression=Key("PK").eq(f"USER#{user_id}")
         & Key("SK").eq(f"APPT#{start_datetime}")
     )
-    return Appointment(**response["Item"])
+    return [Appointment.from_item(item) for item in response["Items"]]
 
 
 def list_schedule(user_id, start, end):

@@ -4,8 +4,12 @@ from appointment import get_appointment
 
 
 def lambda_handler(message, context):
-    email = message["pathParameters"]["email"]
-    start_datetime = message["pathParameters"]["start_datetime"]
+    user_id = message["requestContext"]["authorizer"]["claims"]["sub"]
+    start = message["pathParameters"]["id"]
 
-    appointment = get_appointment(email, start_datetime)
-    return {"statusCode": 200, "headers": {}, "body": json.dumps(appointment)}
+    appointments = get_appointment(user_id, start)
+    return {
+        "statusCode": 200,
+        "headers": {},
+        "body": json.dumps([appointment.__dict__ for appointment in appointments]),
+    }
