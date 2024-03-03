@@ -16,16 +16,6 @@ class User(Item):
     date_created: datetime
     availability: List[WorkDay]
 
-    @classmethod
-    def from_item(cls, item):
-        return cls(
-            item["user_id"],
-            item["username"],
-            item["email"],
-            item["date_created"],
-            item["availability"],
-        )
-
     def pk(self):
         return f"USER#{self.user_id}"
 
@@ -35,11 +25,7 @@ class User(Item):
     def to_item(self):
         return {
             **self.keys(),
-            "user_id": self.user_id,
-            "username": self.username,
-            "email": self.email,
-            "date_created": self.date_created,
-            "availability": self.availability,
+            **self.model_dump(),
             "item_type": "user",
         }
 
@@ -52,7 +38,7 @@ def get_user(user_id):
         KeyConditionExpression=Key("PK").eq(user_id_key) & Key("SK").eq(user_id_key)
     )
     print(response)
-    return User.from_item(response["Items"][0])
+    return [User(**item) for item in response["Items"]]
 
 
 def create_or_update_user(user):

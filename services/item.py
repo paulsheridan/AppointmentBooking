@@ -1,4 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, field_serializer
+from uuid import UUID
+from datetime import datetime
 from abc import abstractmethod
 
 
@@ -18,3 +20,11 @@ class Item(BaseModel):
     @abstractmethod
     def to_item():
         pass
+
+    @field_serializer("user_id", check_fields=False)
+    def serialize_uuid(self, user_id: UUID):
+        return str(user_id)
+
+    @field_serializer("start_datetime", "end_datetime", "date_created", check_fields=False)
+    def serialize_datetime(self, datetime: datetime):
+        return datetime.isoformat()

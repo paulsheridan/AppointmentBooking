@@ -1,5 +1,6 @@
-from pydantic import EmailStr, PhoneNumber
+from pydantic import EmailStr
 from uuid import UUID
+from pydantic_extra_types.phone_numbers import PhoneNumber
 from boto3.dynamodb.conditions import Key
 
 from item import Item
@@ -15,18 +16,6 @@ class Client(Item):
     preferred_contact: str
     phone_number: PhoneNumber
 
-    @classmethod
-    def from_item(cls, item):
-        return cls(
-            item["user_id"],
-            item["email"],
-            item["name"],
-            item["pronouns"],
-            item["over_18"],
-            item["preferred_contact"],
-            item["phone_number"],
-        )
-
     def pk(self):
         return f"USER#{self.user_id}"
 
@@ -36,13 +25,7 @@ class Client(Item):
     def to_item(self):
         return {
             **self.keys(),
-            "user_id": self.user_id,
-            "email": self.email,
-            "name": self.name,
-            "pronouns": self.pronouns,
-            "over_18": self.over_18,
-            "preferred_contact": self.preferred_contact,
-            "phone_number": self.phone_number,
+            **self.model_dump(),
             "item_type": "client",
         }
 
@@ -55,14 +38,13 @@ def create_or_update_client(client):
 
 
 def get_client(user_id, email):
-    user_id_key = f"USER#{user_id}"
-    email_key = f"CLIENT#{email}"
-
     table = get_dynamodb_table()
+
     response = table.query(
-        KeyConditionExpression=Key("PK").eq(user_id_key) & Key("SK").eq(email_key)
+        KeyConditionExpression=Key("PK").eq(f"USER#{user_id}")
+        & Key("SK").eq(f"CLIENT#{email}")
     )
-    return [Client.from_item(item) for item in response["Items"]]
+    return [Client(**item) for item in response["Items"]]
 
 
 def list_clients(user_id):
@@ -71,4 +53,4 @@ def list_clients(user_id):
     response = table.query(
         KeyConditionExpression=Key("PK").eq(f"USER#{user_id}") & Key("SK").begins_with("CLIENT#"),
     )
-    return [Client.from_item(item) for item in response["Items"]]
+    return [Client(**item) for item in response["Items"]]

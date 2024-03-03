@@ -5,28 +5,18 @@ from item import Item
 
 class WorkDay(Item):
     user_id: UUID
-    date = date
-    time_slots = dict
-
-    @classmethod
-    def from_item(cls, item):
-        return cls(
-            item["user_id"],
-            item["date"],
-            item["time_slots"],
-        )
+    date_scheduled: date
+    time_slots: dict
 
     def pk(self):
         return f"USER#{self.user_id}"
 
     def sk(self):
-        return f"DATE#{self.date}"
+        return f"DATE#{self.date_scheduled}"
 
     def to_item(self):
         return {
             **self.keys(),
-            "user_id": self.user_id,
-            "date": self.date,
-            "time_slots": self.time_slots,
+            **self.model_dump(),
             "item_type": "work_day",
         }
