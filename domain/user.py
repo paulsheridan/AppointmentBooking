@@ -5,7 +5,6 @@ from datetime import datetime
 from boto3.dynamodb.conditions import Key
 
 from item import Item
-from work_day import WorkDay
 from table_util import get_dynamodb_table
 
 
@@ -14,7 +13,6 @@ class User(Item):
     username: str
     email: EmailStr
     date_created: datetime
-    availability: List[WorkDay]
 
     def pk(self):
         return f"USER#{self.user_id}"
@@ -37,7 +35,6 @@ def get_user(user_id):
     response = table.query(
         KeyConditionExpression=Key("PK").eq(user_id_key) & Key("SK").eq(user_id_key)
     )
-    print(response)
     return [User(**item) for item in response["Items"]]
 
 

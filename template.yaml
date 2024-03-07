@@ -72,7 +72,34 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref AppointmentsTable
       Layers:
-      - !Ref Services
+      - !Ref DomainLayer
+
+  CreateService:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub CreateService-${Stage}
+      CodeUri: handlers/create_service/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Environment:
+        Variables:
+          STAGE: !Ref Stage
+          TABLE_NAME: !Ref TableName
+      Events:
+        AppointmentApi:
+          Type: Api
+          Properties:
+            Path: /services
+            Method: post
+            RestApiId:
+              Ref: AppointmentApi
+            Auth:
+              Authorizer: CognitoAuthorizer
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AppointmentsTable
+      Layers:
+      - !Ref DomainLayer
 
   GetAppointment:
     Type: AWS::Serverless::Function
@@ -99,7 +126,7 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref AppointmentsTable
       Layers:
-      - !Ref Services
+      - !Ref DomainLayer
 
   RequestAppointment:
     Type: AWS::Serverless::Function
@@ -124,7 +151,7 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref AppointmentsTable
       Layers:
-      - !Ref Services
+      - !Ref DomainLayer
 
   GetScheduleByMonth:
     Type: AWS::Serverless::Function
@@ -151,7 +178,7 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref AppointmentsTable
       Layers:
-      - !Ref Services
+      - !Ref DomainLayer
 
   ConfirmAppointment:
     Type: AWS::Serverless::Function
@@ -178,7 +205,7 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref AppointmentsTable
       Layers:
-      - !Ref Services
+      - !Ref DomainLayer
 
   CancelAppointment:
     Type: AWS::Serverless::Function
@@ -205,7 +232,7 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref AppointmentsTable
       Layers:
-      - !Ref Services
+      - !Ref DomainLayer
 
   CreateClient:
     Type: AWS::Serverless::Function
@@ -232,7 +259,7 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref AppointmentsTable
       Layers:
-      - !Ref Services
+      - !Ref DomainLayer
 
   GetClient:
     Type: AWS::Serverless::Function
@@ -259,7 +286,7 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref AppointmentsTable
       Layers:
-      - !Ref Services
+      - !Ref DomainLayer
 
   ListClients:
     Type: AWS::Serverless::Function
@@ -286,12 +313,12 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref AppointmentsTable
       Layers:
-      - !Ref Services
+      - !Ref DomainLayer
 
-  Services:
+  DomainLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
-      ContentUri: services/
+      ContentUri: domain/
       CompatibleRuntimes:
         - python3.12
     Metadata:
@@ -316,7 +343,7 @@ Resources:
         - AttributeName: "SK"
           KeyType: "RANGE"
       GlobalSecondaryIndexes:
-        - IndexName: 'GSI1'
+        - IndexName: "GSI1"
           KeySchema:
           - AttributeName: "GSI1PK"
             KeyType: "HASH"
@@ -365,7 +392,7 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref AppointmentsTable
       Layers:
-      - !Ref Services
+      - !Ref DomainLayer
       Events:
         CognitoTrigger:
           Type: Cognito
@@ -411,7 +438,7 @@ Resources:
     Properties:
       ResourceGroupName:
         Ref: ApplicationResourceGroup
-      AutoConfigurationEnabled: 'true'
+      AutoConfigurationEnabled: "true"
 
 Outputs:
   AppointmentApi:
