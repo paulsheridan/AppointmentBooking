@@ -2,6 +2,8 @@ from uuid import UUID
 from pydantic import BaseModel, FutureDate, field_serializer
 from datetime import time
 from typing import List
+from boto3.dynamodb.conditions import Key
+
 
 from item import Item
 from table_util import get_dynamodb_table
@@ -46,3 +48,13 @@ def create_service(service):
     table = get_dynamodb_table()
     table.put_item(Item=service.to_item())
     return service
+
+
+def get_service(user_id, service_id):
+    table = get_dynamodb_table()
+
+    response = table.query(
+        KeyConditionExpression=Key("PK").eq(f"USER#{user_id}")
+        & Key("SK").eq(f"SRVC#{service_id}")
+    )
+    return [Service(**item) for item in response["Items"]]
