@@ -22,13 +22,6 @@ class Client(Item):
     def sk(self):
         return f"CLIENT#{self.email}"
 
-    def to_item(self):
-        return {
-            **self.keys(),
-            **self.model_dump(),
-            "item_type": "client",
-        }
-
 
 def create_or_update_client(client):
     table = get_dynamodb_table()

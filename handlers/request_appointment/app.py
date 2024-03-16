@@ -23,8 +23,8 @@ def lambda_handler(message, context):
     appointment = Appointment(
         user_id = request_data["user_id"],
         client_email = request_data["client_email"],
-        start_datetime = request_data["start_datetime"],
-        end_datetime = request_data["end_datetime"],
+        start = request_data["start"],
+        end = request_data["end"],
         confirmed = False,
         canceled = False,
     )

@@ -1,8 +1,9 @@
 from uuid import UUID
-from pydantic import BaseModel, FutureDate, field_serializer
-from datetime import time
-from typing import List
+from pydantic import BaseModel, field_serializer
+from datetime import date, time
+from typing import List, Dict
 from boto3.dynamodb.conditions import Key
+from typing_extensions import TypedDict
 
 
 from item import Item
@@ -10,7 +11,6 @@ from table_util import get_dynamodb_table
 
 
 class DailySchedule(BaseModel):
-    weekday: int
     open: time
     close: time
 
@@ -26,9 +26,9 @@ class Service(Item):
     active: bool
     duration: int
     max_per_day: int
-    start: FutureDate
-    end: FutureDate
-    schedule: List[DailySchedule]
+    start: date
+    end: date
+    schedule: Dict[int, DailySchedule]
 
     def pk(self):
         return f"USER#{self.user_id}"
@@ -36,16 +36,10 @@ class Service(Item):
     def sk(self):
         return f"SRVC#{self.service_id}"
 
-    def to_item(self):
-        return {
-            **self.keys(),
-            **self.model_dump(),
-            "item_type": "service",
-        }
-
 
 def create_service(service):
     table = get_dynamodb_table()
+    # TODO: validate that dates are in the future, since Service won't anymore.
     table.put_item(Item=service.to_item())
     return service
 

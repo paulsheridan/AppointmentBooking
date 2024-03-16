@@ -1,6 +1,6 @@
 from pydantic import BaseModel, field_serializer
 from uuid import UUID
-from datetime import datetime
+from datetime import datetime, date
 from abc import abstractmethod
 
 
@@ -14,21 +14,24 @@ class Item(BaseModel):
     def sk():
         pass
 
-    def keys(self):
+    def keys(self) -> dict:
         return {"PK": self.pk(), "SK": self.sk()}
 
-    @abstractmethod
-    def to_item():
-        pass
+    def to_item(self) -> dict:
+        return {
+            **self.keys(),
+            **self.model_dump(),
+            "item_type": self.__class__.__name__.lower(),
+        }
 
     @field_serializer("user_id", "service_id", check_fields=False)
-    def serialize_uuid(self, user_id: UUID):
+    def serialize_uuid(self, user_id: UUID) -> str:
         return str(user_id)
 
-    @field_serializer("start_datetime", "end_datetime", "date_created", check_fields=False)
-    def serialize_datetime(self, datetime: datetime):
+    @field_serializer("start", "end", "date_created", check_fields=False)
+    def serialize_datetime(self, datetime: datetime) -> str:
         return datetime.isoformat("T", "minutes")
 
     @field_serializer("start", "end", check_fields=False)
-    def serialize_date(self, date: datetime.date):
+    def serialize_date(self, date: date) -> str:
         return date.isoformat()

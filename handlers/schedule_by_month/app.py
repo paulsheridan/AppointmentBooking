@@ -1,6 +1,6 @@
 import json
 
-from appointment import list_schedule
+from appointment import list_appointments
 
 
 def lambda_handler(message, context):
@@ -15,7 +15,7 @@ def lambda_handler(message, context):
     user_id = message["requestContext"]["authorizer"]["claims"]["sub"]
     month = message["pathParameters"]["month"]
 
-    appointments = list_schedule(user_id, f"{month}-00", f"{month}-31")
+    appointments = list_appointments(user_id, f"{month}-00", f"{month}-31")
     return {
         "statusCode": 200,
         "headers": {},
