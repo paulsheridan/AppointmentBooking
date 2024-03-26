@@ -22,8 +22,6 @@ Parameters:
   AppName:
     Type: String
     Default: Appointments
-  CognitoUserEmail:
-    Type: String
   TableName:
     Type: String
     Default: Appointments-Table-dev
@@ -174,6 +172,31 @@ Resources:
               Ref: AppointmentApi
             Auth:
               Authorizer: CognitoAuthorizer
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AppointmentsTable
+      Layers:
+      - !Ref DomainLayer
+
+  GetAvailability:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub GetAvailability-${Stage}
+      CodeUri: handlers/get_availability/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Environment:
+        Variables:
+          STAGE: !Ref Stage
+          TABLE_NAME: !Ref TableName
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /availability/{artist}
+            Method: get
+            RestApiId:
+              Ref: AppointmentApi
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref AppointmentsTable

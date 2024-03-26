@@ -31,7 +31,3 @@ class Item(BaseModel):
     @field_serializer("start", "end", "date_created", check_fields=False)
     def serialize_datetime(self, datetime: datetime) -> str:
         return datetime.isoformat("T", "minutes")
-
-    @field_serializer("start", "end", check_fields=False)
-    def serialize_date(self, date: date) -> str:
-        return date.isoformat()

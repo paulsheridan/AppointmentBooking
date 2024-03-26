@@ -21,14 +21,14 @@ class User(Item):
         return f"USER#{self.user_id}"
 
 
-def get_user(user_id: str) -> list[User]:
+def get_user(user_id: str) -> User:
     table = get_dynamodb_table()
 
     user_id_key: str = f"USER#{user_id}"
     response: dict = table.query(
         KeyConditionExpression=Key("PK").eq(user_id_key) & Key("SK").eq(user_id_key)
     )
-    return [User(**item) for item in response["Items"]]
+    return User(**response["Items"][0])
 
 
 def create_or_update_user(user: User) -> User:

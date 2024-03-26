@@ -6,9 +6,11 @@ name = "pypi"
 [packages]
 pydantic = "*"
 boto3 = "*"
+email-validator = "*"
 
 [dev-packages]
 black = "*"
+pytest = "*"
 
 [requires]
 python_version = "3.12"

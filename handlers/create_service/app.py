@@ -8,11 +8,12 @@ from service import DailySchedule, Service, create_service
 
 
 def lambda_handler(message, context):
+    user_id = message["requestContext"]["authorizer"]["claims"]["sub"]
     request_data = json.loads(message["body"])
 
     service = Service(
         service_id=uuid.uuid4(),
-        user_id=request_data["user_id"],
+        user_id=user_id,
         name=request_data["name"],
         active=request_data["active"],
         duration=request_data["duration"],
