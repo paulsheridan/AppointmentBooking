@@ -3,8 +3,8 @@ from uuid import UUID
 from datetime import datetime
 from boto3.dynamodb.conditions import Key
 
-from .item import Item
-from .table_util import get_dynamodb_table
+from item import Item
+from table_util import get_dynamodb_table
 
 
 class Appointment(Item):
@@ -35,6 +35,8 @@ def get_appointment(user_id: str, start: str) -> Appointment:
         KeyConditionExpression=Key("PK").eq(f"USER#{user_id}")
         & Key("SK").eq(f"APPT#{start}")
     )
+    if not response["items"]:
+        raise FileNotFoundError
     return Appointment(**response["Items"][0])
 
 

@@ -11,6 +11,9 @@ email-validator = "*"
 [dev-packages]
 black = "*"
 pytest = "*"
+pytest-cov = "*"
+pytest-mock = "*"
+freezegun = "*"
 
 [requires]
 python_version = "3.12"
