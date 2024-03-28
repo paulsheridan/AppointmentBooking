@@ -223,9 +223,9 @@ def test_calc_day_availability_with_only_early_late_appts(test_service_short_hrs
     ]
     test_appts = [Appointment.model_validate(item) for item in json_appts]
     test_avail = calc_day_availability(service, test_appts, datetime.date(2024, 4, 3))
-    assert test_avail == {
-        "date": datetime.date(2024, 4, 3),
-        "times": [
+    assert test_avail.model_dump() == {
+        "date": datetime.datetime(2024, 4, 3, 0, 0),
+        "windows": [
             {
                 "end": datetime.datetime(2024, 4, 3, 11, 29),
                 "start": datetime.datetime(2024, 4, 3, 11, 0),
@@ -284,9 +284,9 @@ def test_calc_day_availability_with_existing_appts(test_service_short_hrs):
     ]
     test_appts = [Appointment.model_validate(item) for item in json_appts]
     test_avail = calc_day_availability(service, test_appts, datetime.date(2024, 4, 8))
-    assert test_avail == {
-        "date": datetime.date(2024, 4, 8),
-        "times": [
+    assert test_avail.model_dump() == {
+        "date": datetime.datetime(2024, 4, 8, 0, 0),
+        "windows": [
             {
                 "end": datetime.datetime(2024, 4, 8, 11, 29),
                 "start": datetime.datetime(2024, 4, 8, 11, 0),
@@ -313,9 +313,9 @@ def test_calc_day_availability_with_full_schedule(
     service = test_service_short_hrs
     test_appts = test_appointments_a
     test_avail = calc_day_availability(service, test_appts, datetime.date(2024, 4, 8))
-    assert test_avail == {
-        "date": datetime.date(2024, 4, 8),
-        "times": [
+    assert test_avail.model_dump() == {
+        "date": datetime.datetime(2024, 4, 8, 0, 0),
+        "windows": [
             {
                 "end": datetime.datetime(2024, 4, 8, 12, 44),
                 "start": datetime.datetime(2024, 4, 8, 12, 15),
@@ -327,9 +327,9 @@ def test_calc_day_availability_with_full_schedule(
 def test_calc_day_availability_no_current_appointments(test_service_long):
     service = test_service_long
     test_avail = calc_day_availability(service, [], datetime.date(2024, 4, 3))
-    assert test_avail == {
-        "date": datetime.date(2024, 4, 3),
-        "times": [
+    assert test_avail.model_dump() == {
+        "date": datetime.datetime(2024, 4, 3, 0, 0),
+        "windows": [
             {
                 "end": datetime.datetime(2024, 4, 3, 9, 29),
                 "start": datetime.datetime(2024, 4, 3, 9, 0),
@@ -391,7 +391,9 @@ def test_calc_day_availability_no_current_appointments(test_service_long):
 
 
 @freeze_time("2024-04-06")
-def test_get_availability(mocker, test_service_long, test_appointments_april_2024):
+def test_get_availability_returns_entire_month(
+    mocker, test_service_long, test_appointments_april_2024
+):
     service = test_service_long
     mocker.patch("domain.availability.get_service", return_value=service)
     mocker.patch(
@@ -404,7 +406,7 @@ def test_get_availability(mocker, test_service_long, test_appointments_april_202
     days_in_office = [0, 2, 4, 5]
     assert len(available_times) == 14
     for day in available_times:
-        assert day["date"].weekday() in days_in_office
+        assert day.date.weekday() in days_in_office
 
 
 @freeze_time("2024-04-06")
@@ -424,7 +426,7 @@ def test_get_availability_raises_index_error_outside_service_time(
 
 
 @freeze_time("2024-04-06")
-def test_get_availability(
+def test_get_availability_returns_correct_office_days(
     mocker, test_service_short_april_2024, test_appointments_april_2024
 ):
     service = test_service_short_april_2024
@@ -439,4 +441,4 @@ def test_get_availability(
     days_in_office = [0, 2, 3, 4, 5]
     assert len(available_times) == 4
     for day in available_times:
-        assert day["date"].weekday() in days_in_office
+        assert day.date.weekday() in days_in_office

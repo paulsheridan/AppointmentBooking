@@ -39,7 +39,7 @@ def get_availability(
         today_appointments = [appt for appt in appointments if appt.start.date() == day]
         today_slots = calc_day_availability(service, today_appointments, day)
 
-        if len(today_slots["windows"]) > 0:
+        if today_slots and len(today_slots.windows) > 0:
             available_times.append(today_slots)
 
     return available_times
@@ -47,11 +47,11 @@ def get_availability(
 
 def calc_day_availability(service: Service, appointments: list[Appointment], day: date):
     office_hours = service.get_daily_schedule(day.weekday())
-    today_slots: dict = {"date": day, "windows": []}
     if not office_hours:
-        return today_slots
+        return None
 
     appt_index = 0
+    today_slots: dict = {"date": day, "windows": []}
     window_start = datetime.combine(day, office_hours.open)
     window_end = (
         window_start + timedelta(minutes=service.duration) - timedelta(minutes=1)
@@ -61,41 +61,25 @@ def calc_day_availability(service: Service, appointments: list[Appointment], day
         if not appointments or appt_index >= len(appointments):
             today_slots["windows"].append({"start": window_start, "end": window_end})
             window_start = window_end + timedelta(minutes=1)
-            # TODO: DRY this out
-            window_end = (
-                window_start
-                + timedelta(minutes=service.duration)
-                - timedelta(minutes=1)
-            )
         else:
-            r1 = Range(
-                start=window_start,
-                end=window_end,
-            )
-            r2 = Range(
-                start=appointments[appt_index].start,
-                end=appointments[appt_index].end,
-            )
-            if r1.end < r2.start:
+            if window_end < appointments[appt_index].start:
                 today_slots["windows"].append(
                     {"start": window_start, "end": window_end}
                 )
                 window_start = window_end + timedelta(minutes=1)
-            elif r2.end < r1.start:
+            elif appointments[appt_index].end < window_start:
                 today_slots["windows"].append(
                     {"start": window_start, "end": window_end}
                 )
                 window_start = window_end + timedelta(minutes=1)
                 appt_index += 1
             else:
-                window_start = r2.end + timedelta(minutes=1)
+                window_start = appointments[appt_index].end + timedelta(minutes=1)
                 appt_index += 1
-            window_end = (
-                window_start
-                + timedelta(minutes=service.duration)
-                - timedelta(minutes=1)
-            )
-    return today_slots
+        window_end = (
+            window_start + timedelta(minutes=service.duration) - timedelta(minutes=1)
+        )
+    return Availability(**today_slots)
 
 
 def determine_date_range(
