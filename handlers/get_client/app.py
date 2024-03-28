@@ -11,5 +11,5 @@ def lambda_handler(message, context):
     return {
         "statusCode": 200,
         "headers": {},
-        "body": json.dumps(client.model_dump(exclude={"user_id"})),
+        "body": json.dumps(client.model_dump(mode="json", exclude={"user_id"})),
     }

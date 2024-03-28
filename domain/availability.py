@@ -2,13 +2,24 @@ import calendar
 
 from datetime import date, datetime, timedelta
 from collections import namedtuple
-from typing import Optional
+from typing import Optional, List
+from pydantic import BaseModel
 
 from service import get_service, Service
 from appointment import list_appointments, Appointment
 
 
 Range = namedtuple("Range", ["start", "end"])
+
+
+class Window(BaseModel):
+    start: datetime
+    end: datetime
+
+
+class Availability(BaseModel):
+    date: datetime
+    windows: Optional[List[Window]]
 
 
 def get_availability(
@@ -28,7 +39,7 @@ def get_availability(
         today_appointments = [appt for appt in appointments if appt.start.date() == day]
         today_slots = calc_day_availability(service, today_appointments, day)
 
-        if len(today_slots["times"]) > 0:
+        if len(today_slots["windows"]) > 0:
             available_times.append(today_slots)
 
     return available_times
@@ -36,7 +47,7 @@ def get_availability(
 
 def calc_day_availability(service: Service, appointments: list[Appointment], day: date):
     office_hours = service.get_daily_schedule(day.weekday())
-    today_slots: dict = {"date": day, "times": []}
+    today_slots: dict = {"date": day, "windows": []}
     if not office_hours:
         return today_slots
 
@@ -48,7 +59,7 @@ def calc_day_availability(service: Service, appointments: list[Appointment], day
 
     while window_end < datetime.combine(day, office_hours.close):
         if not appointments or appt_index >= len(appointments):
-            today_slots["times"].append({"start": window_start, "end": window_end})
+            today_slots["windows"].append({"start": window_start, "end": window_end})
             window_start = window_end + timedelta(minutes=1)
             # TODO: DRY this out
             window_end = (
@@ -66,10 +77,14 @@ def calc_day_availability(service: Service, appointments: list[Appointment], day
                 end=appointments[appt_index].end,
             )
             if r1.end < r2.start:
-                today_slots["times"].append({"start": window_start, "end": window_end})
+                today_slots["windows"].append(
+                    {"start": window_start, "end": window_end}
+                )
                 window_start = window_end + timedelta(minutes=1)
             elif r2.end < r1.start:
-                today_slots["times"].append({"start": window_start, "end": window_end})
+                today_slots["windows"].append(
+                    {"start": window_start, "end": window_end}
+                )
                 window_start = window_end + timedelta(minutes=1)
                 appt_index += 1
             else:

@@ -9,6 +9,7 @@ def lambda_handler(message, context):
     month = message["queryStringParameters"]["month"]
 
     available = get_availability(user_id, service_id, month)
+    print(available)
     return {
         "statusCode": 200,
         "headers": {},

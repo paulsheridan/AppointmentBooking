@@ -35,8 +35,6 @@ def get_appointment(user_id: str, start: str) -> Appointment:
         KeyConditionExpression=Key("PK").eq(f"USER#{user_id}")
         & Key("SK").eq(f"APPT#{start}")
     )
-    if not response["items"]:
-        raise FileNotFoundError
     return Appointment(**response["Items"][0])
 
 
